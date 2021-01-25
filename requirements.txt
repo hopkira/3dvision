@@ -1,0 +1,12 @@
+argcomplete==1.12.1
+certifi==2020.12.5
+chardet==3.0.4
+depthai==0.4.1.1
+idna==2.10
+importlib-metadata==2.1.1
+numpy==1.19.5
+opencv-python==4.5.1.48
+PyYAML==5.3.1
+requests==2.24.0
+urllib3==1.25.11
+zipp==3.4.0
