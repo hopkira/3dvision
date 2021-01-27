@@ -52,6 +52,12 @@ while True:
             frame = (65535 // frame).astype(np.uint8)
             img_scaled = cv2.resize(frame, None, fx=decimate, fy=decimate, interpolation = cv2.INTER_NEAREST_EXACT)
             cv2.imshow('Depth', img_scaled)
+            Q2 = np.float32([[1,0,0,0],
+                [0,-1,0,0],
+                [0,0,857.06 * 0.05,0],
+                [0,0,0,1]])
+            points_3D = cv2.reprojectImageTo3D(img_scaled, Q2)
+
 
     if cv2.waitKey(1) == ord('q'):
         break
