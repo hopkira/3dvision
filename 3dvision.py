@@ -60,16 +60,12 @@ def on_trackbar_change(value):
     device.send_disparity_confidence_threshold(value)
     return
 
-stream_windows = ['depth']
-
-for stream in stream_windows:
-    if stream in ["disparity", "disparity_color", "depth"]:
-        cv2.namedWindow(stream)
-        trackbar_name = 'Disparity confidence'
-        conf_thr_slider_min = 0
-        conf_thr_slider_max = 255
-        cv2.createTrackbar(trackbar_name, stream, conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
-        cv2.setTrackbarPos(trackbar_name, stream, disparity_confidence_threshold)
+cv2.namedWindow('depth')
+trackbar_name = 'Disparity confidence'
+conf_thr_slider_min = 0
+conf_thr_slider_max = 255
+cv2.createTrackbar(trackbar_name, stream, conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
+cv2.setTrackbarPos(trackbar_name, stream, disparity_confidence_threshold)
 
 decimate =20
 max_dist = 4000.0
@@ -95,10 +91,6 @@ while True: # main loop until 'q' is pressed
 
         if packet.stream_name == 'depth':
             frame = packet.getData()
-
-            meta = packet.getMetadata()
-            camera = meta.getCameraName()
-            window_name = 'Body cam -' + camera
             
             # create a specific frame for display
             image_frame = np.copy(frame)
@@ -123,7 +115,7 @@ while True: # main loop until 'q' is pressed
                     cv2.putText(image_frame, 'y:' '{:7.3f}'.format(detection.depth_y) + ' m', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                     pt_t5 = x_1 + 5, y_1 + 100
                     cv2.putText(image_frame, 'z:' '{:7.3f}'.format(detection.depth_z) + ' m', pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-            cv2.imshow(window_name, image_frame)
+            cv2.imshow('depth', image_frame)
 
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
