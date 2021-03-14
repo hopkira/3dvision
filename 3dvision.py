@@ -49,7 +49,7 @@ y_bins = pd.interval_range(start= 0, end = 800, periods = 8)
 nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
 
 while True: # main loop until 'q' is pressed
-
+    print("In main loop...")
     for nnet_packet in nnet_packets:
         detections = list(nnet_packet.getDetectedObjects())
 
@@ -122,9 +122,6 @@ while True: # main loop until 'q' is pressed
             # Turn into a 1D array
             closest = closest.reshape(1,-1)
             print(closest)
-
-    if cv2.waitKey(1) == ord('q'):
-        break
 
 del body_cam
 del device
