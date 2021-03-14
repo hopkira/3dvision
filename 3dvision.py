@@ -88,7 +88,7 @@ while True: # main loop until 'q' is pressed
         detections = list(nnet_packet.getDetectedObjects())
         for detection in detections:
             if detection.label == 5: # we're looking for a bottle...
-                print("Bottle is ", nn2depth,"m away.")
+                print('Bottle is ','{:7.2f}'.format(detection.depth_z),'m away.')
 
     for packet in data_packets:
 
