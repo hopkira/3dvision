@@ -122,6 +122,14 @@ while True: # main loop until 'q' is pressed
                         cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         pt_t5 = x_1 + 5, y_1 + 100
                         cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        now_frame = time.time() 
+                        fps = 1/(now_frame - prev_frame) 
+                        prev_frame = now_frame
+                        fps = str(int(fps))
+                        pt_t6 = x_1 + 5, y_1 + 120
+                        cv2.putText(image_frame, 'fps: ' + fps, pt_t6, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+
+            cv2.imshow('depth', image_frame)
 
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
@@ -162,17 +170,6 @@ while True: # main loop until 'q' is pressed
             # Turn into a 1D array
             closest = closest.reshape(1,-1)
             # print(closest)
-
-            now_frame = time.time() 
-
-            fps = 1/(now_frame - prev_frame) 
-            prev_frame = now_frame
-            fps = str(int(fps))
-
-            pt_t6 = x_1 + 5, y_1 + 120
-            cv2.putText(image_frame, 'fps: ' + fps, pt_t6, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-
-            cv2.imshow('depth', image_frame)
     
     if cv2.waitKey(1) == ord('q'):
         break
