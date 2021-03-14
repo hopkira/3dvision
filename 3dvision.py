@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import sys
 import cv2
 import depthai
 import numpy as np
 import pandas as pd
 import logo
+
+sys.path.append('/home/pi/k9-chess-angular/python') 
 
 device = depthai.Device('', False)
 body_cam = device.create_pipeline(config={

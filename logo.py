@@ -260,10 +260,15 @@ def circle(radius, extent):
     curr_click_vel1, curr_click_vel2 = get_speed()
     click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod)
     click_vel2 = calc_click_vel(clicks=distance2, turn_mod=turn_mod)
-    #  given the current velocity and distance decide
-    #  whether to accelerate, maintain, decelerate OR
-    #  maintain and declerate OR 
-    #  decelerate
+    # given the current velocity and distance
+    # work out how far it would take to accelerate OR
+    # decelerate to max velocity,
+    # maintain max speeed
+    # then decelerate given ACCELERATION
+    #
+    # if there's enough distanc then acclerate, maintain and decelerate
+    # if not, then just decelerate
+
     if abs(curr_click_vel1) >= abs(curr_click_vel1):
         X
 
