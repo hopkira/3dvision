@@ -118,12 +118,12 @@ while True: # main loop until 'q' is pressed
                     cv2.rectangle(image_frame, pt1, pt2, color)
                     cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  
                     color1 = (0, 255, 0)
-                    x1, y1 = pt1
-                    pt_t3 = x1 + 5, y1 + 60
+                    x_1, y_1 = pt1
+                    pt_t3 = x_1 + 5, y_1 + 60
                     cv2.putText(image_frame, 'x:' '{:7.3f}'.format(detection.depth_x) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-                    pt_t4 = x1 + 5, y1 + 80
+                    pt_t4 = x_1 + 5, y_1 + 80
                     cv2.putText(image_frame, 'y:' '{:7.3f}'.format(detection.depth_y) + ' m', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-                    pt_t5 = x1 + 5, y1 + 100
+                    pt_t5 = x_1 + 5, y_1 + 100
                     cv2.putText(image_frame, 'z:' '{:7.3f}'.format(detection.depth_z) + ' m', pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
             cv2.imshow(window_name, image_frame)
 
