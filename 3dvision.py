@@ -71,7 +71,7 @@ for stream in stream_windows:
         cv2.createTrackbar(trackbar_name, stream, conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
         cv2.setTrackbarPos(trackbar_name, stream, disparity_confidence_threshold)
 
-decimate = 5
+decimate =20
 max_dist = 4000.0
 height = 400.0
 width = 640.0
