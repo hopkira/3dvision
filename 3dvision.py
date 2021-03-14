@@ -31,8 +31,41 @@ body_cam = device.create_pipeline(config={
     }
 })
 
+# Retrieve model class labels from model config file.
+model_config_file = config["ai"]["blob_file_config"]
+mcf = open(model_config_file)
+model_config_dict = json.load(mcf)
+labels = model_config_dict["mappings"]["labels"]
+print(labels)
+
 if body_cam is None:
     raise RuntimeError("Error initializing body camera")
+
+nn2depth = device.get_nn_to_depth_bbox_mapping()
+
+def nn_to_depth_coord(x, y, nn2depth):
+    x_depth = int(nn2depth['off_x'] + x * nn2depth['max_w'])
+    y_depth = int(nn2depth['off_y'] + y * nn2depth['max_h'])
+    return x_depth, y_depth
+
+detections = []
+
+disparity_confidence_threshold = 130
+
+def on_trackbar_change(value):
+    device.send_disparity_confidence_threshold(value)
+    return
+
+stream_windows = ['depth']
+
+for stream in stream_windows:
+    if stream in ["disparity", "disparity_color", "depth"]:
+        cv2.namedWindow(stream)
+        trackbar_name = 'Disparity confidence'
+        conf_thr_slider_min = 0
+        conf_thr_slider_max = 255
+        cv2.createTrackbar(trackbar_name, stream, conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
+        cv2.setTrackbarPos(trackbar_name, stream, disparity_confidence_threshold)
 
 decimate = 5
 max_dist = 4000.0
@@ -46,9 +79,10 @@ fy = 2.05
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start= 0, end = 800, periods = 8)
 
-nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
-
 while True: # main loop until 'q' is pressed
+
+    nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
+
     for nnet_packet in nnet_packets:
         detections = list(nnet_packet.getDetectedObjects())
         print('Detected something')
@@ -123,6 +157,9 @@ while True: # main loop until 'q' is pressed
             # Turn into a 1D array
             closest = closest.reshape(1,-1)
             print(closest)
+    
+    if cv2.waitKey(1) == ord('q'):
+        break
 
 del body_cam
 del device
