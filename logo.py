@@ -13,6 +13,8 @@ import math
 import sys
 import argparse
 
+sys.path.append('/home/pi/k9-chess-angular/python')
+
 sim = False
 
 # Wheel circumference is 0.436m, with 200 clicks per turn
@@ -300,7 +302,7 @@ def init_rc():
     global rc_address
     #  Initialise the roboclaw motorcontroller
     print("Initialising roboclaw driver...")
-    from roboclaw import Roboclaw
+    from roboclaw_3 import Roboclaw
     rc_address = 0x80
     rc = Roboclaw("/dev/roboclaw", 115200)
     rc.Open()
