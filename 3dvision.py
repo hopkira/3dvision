@@ -99,28 +99,27 @@ while True: # main loop until 'q' is pressed
             # colorize depth map
             image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
             if detections is not None:
-                for detection in detections:  
-                    pt1 = nn_to_depth_coord(detection.x_min, detection.y_min, nn2depth)
-                    pt2 = nn_to_depth_coord(detection.x_max, detection.y_max, nn2depth)
-                    color = (255, 255, 255) # bgr
-                    label = labels[int(detection.label)]                 
-                    score = int(detection.confidence * 100)  
-                    cv2.rectangle(image_frame, pt1, pt2, color)
-                    cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  
-                    color1 = (0, 255, 0)
-                    x_1, y_1 = pt1
-                    pt_t3 = x_1 + 5, y_1 + 60
-                    cv2.putText(image_frame, 'x:' '{:7.3f}'.format(detection.depth_x) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-                    pt_t4 = x_1 + 5, y_1 + 80
-                    cv2.putText(image_frame, 'y:' '{:7.3f}'.format(detection.depth_y) + ' m', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-                    pt_t5 = x_1 + 5, y_1 + 100
-                    cv2.putText(image_frame, 'z:' '{:7.3f}'.format(detection.depth_z) + ' m', pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                for detection in detections:
+                    if detection.label == 5: # we're looking for a bottle...
+                        pt1 = nn_to_depth_coord(detection.x_min, detection.y_min, nn2depth)
+                        pt2 = nn_to_depth_coord(detection.x_max, detection.y_max, nn2depth)
+                        color = (255, 255, 255) # bgr
+                        label = labels[int(detection.label)]                 
+                        score = int(detection.confidence * 100)  
+                        cv2.rectangle(image_frame, pt1, pt2, color)
+                        cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  
+                        color1 = (0, 255, 0)
+                        x_1, y_1 = pt1
+                        pt_t3 = x_1 + 5, y_1 + 60
+                        cv2.putText(image_frame, 'x:' '{:7.3f}'.format(detection.depth_x) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        pt_t4 = x_1 + 5, y_1 + 80
+                        cv2.putText(image_frame, 'y:' '{:7.3f}'.format(detection.depth_y) + ' m', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        pt_t5 = x_1 + 5, y_1 + 100
+                        cv2.putText(image_frame, 'z:' '{:7.3f}'.format(detection.depth_z) + ' m', pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
             cv2.imshow('depth', image_frame)
 
             # Process depth map to communicate to robot
-            print("Image shape: ",str(frame.shape))
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
-            print("Decimated shape: ",str(frame.shape))
             height, width = frame.shape
             # Convert depth map to point cloud with valid depths
             column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
