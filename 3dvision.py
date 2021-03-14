@@ -97,7 +97,7 @@ while True: # main loop until 'q' is pressed
             frame = packet.getData()
             
             # create a specific frame for display
-            image_frame = numpy.copy(frame)
+            image_frame = np.copy(frame)
             cv2.putText(image_frame, packet.stream_name, (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255))
             image_frame = (65535 // image_frame).astype(np.uint8)
             # colorize depth map
