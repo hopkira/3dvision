@@ -118,7 +118,9 @@ while True: # main loop until 'q' is pressed
             cv2.imshow('depth', image_frame)
 
             # Process depth map to communicate to robot
+            print("Image shape: ",str(frame.shape))
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
+            print("Decimated shape: ",str(frame.shape))
             height, width = frame.shape
             # Convert depth map to point cloud with valid depths
             column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
@@ -146,6 +148,7 @@ while True: # main loop until 'q' is pressed
             binned_depths = pd.Series(scope[:,2])
             # Average the depth measures in each bin
             totals = binned_depths.groupby([y_index, x_index]).mean()
+            print("Totals", str(totals.shape))
             # Reshape the bins into a 8 x 40 matrix
             #totals = totals.values.reshape(8,40)
             # Determine the nearest segment for each of the 40
