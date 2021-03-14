@@ -76,6 +76,9 @@ cy = height/decimate/2
 fx = 1.4 # values found by measuring known sized objects at known distances
 fy = 2.05
 
+prev_frame = 0
+now_frame = 0
+
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start= 0, end = 800, periods = 8)
 
@@ -88,7 +91,7 @@ while True: # main loop until 'q' is pressed
         detections = list(nnet_packet.getDetectedObjects())
         for detection in detections:
             if detection.label == 5: # we're looking for a bottle...
-                print('Bottle is ' + '{:.2f}'.format(detection.depth_z) + 'm away.')
+                # print('Bottle is ' + '{:.2f}'.format(detection.depth_z) + 'm away.')
 
     for packet in data_packets:
 
@@ -118,7 +121,6 @@ while True: # main loop until 'q' is pressed
                         cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         pt_t5 = x_1 + 5, y_1 + 100
                         cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-            cv2.imshow('depth', image_frame)
 
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
@@ -158,7 +160,18 @@ while True: # main loop until 'q' is pressed
             closest = np.around(closest,-2)
             # Turn into a 1D array
             closest = closest.reshape(1,-1)
-            print(closest)
+            # print(closest)
+
+            now_frame = time.time() 
+
+            fps = 1/(now_frame - prev_frame) 
+            prev_frame = now_frame
+            fps = str(int(fps))
+
+            pt_t6 = x_1 + 5, y_1 + 120
+            cv2.putText(image_frame, 'fps: ' + fps, pt_t6, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+
+            cv2.imshow('depth', image_frame)
     
     if cv2.waitKey(1) == ord('q'):
         break
