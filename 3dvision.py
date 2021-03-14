@@ -64,8 +64,8 @@ cv2.namedWindow('depth')
 trackbar_name = 'Disparity confidence'
 conf_thr_slider_min = 0
 conf_thr_slider_max = 255
-cv2.createTrackbar(trackbar_name, stream, conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
-cv2.setTrackbarPos(trackbar_name, stream, disparity_confidence_threshold)
+cv2.createTrackbar(trackbar_name, 'depth', conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
+cv2.setTrackbarPos(trackbar_name, 'depth', disparity_confidence_threshold)
 
 decimate =20
 max_dist = 4000.0
