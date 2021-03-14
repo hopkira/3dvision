@@ -7,7 +7,7 @@ import json
 import depthai
 import numpy as np
 import pandas as pd
-import skimage.measures as skim
+import skimage.measure as skim
 import logo
 
 sys.path.append('/home/pi/k9-chess-angular/python') 
