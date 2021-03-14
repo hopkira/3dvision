@@ -26,12 +26,12 @@ ACCELERATION = int(TOPSPEED/5)  # accelerate to top speed in 5s
 HALF_WHEEL_GAP = 0.1011
 TURNING_CIRCLE = 2*math.pi*HALF_WHEEL_GAP/CLICK2METRES  # clicks in a full spin
 #print("Turning circle:" + str(TURNING_CIRCLE))
-M1_QPPS = 1987.0   # max speed of wheel in clicks per second
-M2_QPPS = 1837.0
-M1_P = 10.644  # Proportional element of feedback for PID controller
-M2_P = 9.768
-M1_I = 2.206  # Integral element of feedback for PID controller
-M2_I = 2.294
+M1_QPPS = 1987   # max speed of wheel in clicks per second
+M2_QPPS = 1837
+M1_P = 11  # Proportional element of feedback for PID controller
+M2_P = 10
+M1_I = 2  # Integral element of feedback for PID controller
+M2_I = 2
 M1_D = 0.0  # Derived element of feedback for PID controller
 M2_D = 0.0
 
