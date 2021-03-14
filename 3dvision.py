@@ -29,7 +29,7 @@ config={
             # reducing resolution decreases min depth as
             # relative disparity is decreased
             'resolution_h': 400,
-            'fps': 10
+            'fps': 8
         }
     }
 }
