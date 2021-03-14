@@ -111,11 +111,11 @@ while True: # main loop until 'q' is pressed
                         color1 = (0, 255, 0)
                         x_1, y_1 = pt1
                         pt_t3 = x_1 + 5, y_1 + 60
-                        cv2.putText(image_frame, 'x:' '{:7.3f}'.format(detection.depth_x) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        cv2.putText(image_frame, 'x:' '{:7.2f}'.format(detection.depth_x) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         pt_t4 = x_1 + 5, y_1 + 80
-                        cv2.putText(image_frame, 'y:' '{:7.3f}'.format(detection.depth_y) + ' m', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         pt_t5 = x_1 + 5, y_1 + 100
-                        cv2.putText(image_frame, 'z:' '{:7.3f}'.format(detection.depth_z) + ' m', pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
             cv2.imshow('depth', image_frame)
 
             # Process depth map to communicate to robot
@@ -143,6 +143,7 @@ while True: # main loop until 'q' is pressed
             # Index each point into 10cm x and y bins (40 x 8)
             x_index = pd.cut(scope[:,0], x_bins)
             y_index = pd.cut(scope[:,1], y_bins)
+            print("x_index:", str(x_index.shape), " y_index:", str(y_index.shape))
             # Place the depth values into the corresponding bin
             binned_depths = pd.Series(scope[:,2])
             # Average the depth measures in each bin
