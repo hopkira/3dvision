@@ -90,12 +90,10 @@ while True: # main loop until 'q' is pressed
 
     for nnet_packet in nnet_packets:
         detections = list(nnet_packet.getDetectedObjects())
-        print('Detected something')
 
     for packet in data_packets:
 
         if packet.stream_name == 'depth':
-            print('Depth stream working')
             frame = packet.getData()
 
             meta = packet.getMetadata()
@@ -157,15 +155,15 @@ while True: # main loop until 'q' is pressed
             # Average the depth measures in each bin
             totals = binned_depths.groupby([y_index, x_index]).mean()
             # Reshape the bins into a 8 x 40 matrix
-            totals = totals.values.reshape(8,40)
+            #totals = totals.values.reshape(8,40)
             # Determine the nearest segment for each of the 40
             # horizontal segments
-            closest = np.amin(totals, axis = 0 )
+            #closest = np.amin(totals, axis = 0 )
             # Round the to the nearest 10cm
-            closest = np.around(closest,-2)
+            #closest = np.around(closest,-2)
             # Turn into a 1D array
-            closest = closest.reshape(1,-1)
-            print(closest)
+            #closest = closest.reshape(1,-1)
+            #print(closest)
     
     if cv2.waitKey(1) == ord('q'):
         break
