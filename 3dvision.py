@@ -11,14 +11,14 @@ import logo
 sys.path.append('/home/pi/k9-chess-angular/python') 
 
 device = depthai.Device('', False)
-body_cam = device.create_pipeline(config={
+
+config={
     "streams": ["depth","metaout"],
     "ai": {
         "blob_file": "/home/pi/3dvision//mobilenet-ssd/mobilenet-ssd.blob",
         "blob_file_config": "/home/pi/3dvision/mobilenet-ssd/mobilenet-ssd.json",
         "calc_dist_to_bb": True,
         "camera_input": "right"
-
     },
     "camera": {
         "mono": {
@@ -29,7 +29,9 @@ body_cam = device.create_pipeline(config={
             'fps': 10
         }
     }
-})
+}
+
+body_cam = device.create_pipeline(config=config)
 
 # Retrieve model class labels from model config file.
 model_config_file = config["ai"]["blob_file_config"]
