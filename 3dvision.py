@@ -91,7 +91,6 @@ while True: # main loop until 'q' is pressed
 
         if packet.stream_name == 'depth':
             frame = packet.getData()
-            
             # create a specific frame for display
             image_frame = np.copy(frame)
             cv2.putText(image_frame, packet.stream_name, (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255))
@@ -148,7 +147,7 @@ while True: # main loop until 'q' is pressed
             binned_depths = pd.Series(scope[:,2])
             # Average the depth measures in each bin
             totals = binned_depths.groupby([y_index, x_index]).mean()
-            print("Totals", str(totals.shape))
+            print("Totals", str(totals.values.shape))
             # Reshape the bins into a 8 x 40 matrix
             #totals = totals.values.reshape(8,40)
             # Determine the nearest segment for each of the 40
