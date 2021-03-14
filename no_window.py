@@ -8,7 +8,7 @@ import depthai
 import numpy as np
 import pandas as pd
 import skimage.measure as skim
-import logo
+# import logo
 
 sys.path.append('/home/pi/k9-chess-angular/python') 
 
