@@ -82,6 +82,7 @@ fy = 2.05
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start= 0, end = 800, periods = 8)
 
+
 while True: # main loop until 'q' is pressed
 
     nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
@@ -95,6 +96,10 @@ while True: # main loop until 'q' is pressed
         if packet.stream_name == 'depth':
             print('Depth stream working')
             frame = packet.getData()
+
+            meta = packet.getMetadata()
+            camera = meta.getCameraName()
+            window_name = 'Body cam -' + camera
             
             # create a specific frame for display
             image_frame = np.copy(frame)
