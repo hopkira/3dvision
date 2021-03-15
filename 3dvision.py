@@ -125,7 +125,7 @@ while True: # main loop until 'q' is pressed
                         cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         pt_t3 = x_1 + 5, y_1 + 100
                         cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-                        angle = - math.atan2(detection.depth_z, detection.depth_x)
+                        angle = - math.atan2(detection.depth_z, detection.depth_x) - (math.pi / 2)
                         pt_t4 = x_1 + 5, y_1 + 120
                         cv2.putText(image_frame, 'angle:' '{:7.2f}'.format(detection.depth_z) + ' radians', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         now_frame = time.time()
