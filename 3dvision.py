@@ -119,7 +119,7 @@ while True: # main loop until 'q' is pressed
                         cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)  
                         x_1, y_1 = pt1
                         pt_t1 = x_1 + 5, y_1 + 60
-                        angle = - math.atan2(detection.depth_z, detection.depth_x) - (math.pi / 2)
+                        angle = math.pi - math.atan2(detection.depth_z, detection.depth_x)
                         cv2.putText(image_frame, 'x:' '{:7.2f}'.format(detection.depth_x) + ' m', pt_t1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
                         pt_t2 = x_1 + 5, y_1 + 80
                         cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
