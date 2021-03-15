@@ -134,14 +134,14 @@ while True: # main loop until 'q' is pressed
                         fps = str(int(fps))
                         pt_t5 = x_1 + 5, y_1 + 140
                         cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
-                        if move_counter == 10:
+                        if move_counter == 20:
                             if angle > 0.04:
                                 logo.right(abs(angle))
                             elif angle < 0.04:
                                 logo.left(abs(angle))
                             move_counter = 0
-            
-            move_counter += 1
+                        move_counter += 1
+        
             cv2.imshow('depth', image_frame)
 
             # Process depth map to communicate to robot
