@@ -84,6 +84,7 @@ now_frame = 0
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start= 0, end = 800, periods = 8)
 
+move_counter = 0
 
 while True: # main loop until 'q' is pressed
 
@@ -133,11 +134,14 @@ while True: # main loop until 'q' is pressed
                         fps = str(int(fps))
                         pt_t5 = x_1 + 5, y_1 + 140
                         cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
-                        #if angle > 0.04:
-                        #    logo.right(abs(angle))
-                        #elif angle < 0.04:
-                        #    logo.left(abs(angle))
-
+                        if move_counter == 10:
+                            if angle > 0.04:
+                                logo.right(abs(angle))
+                            elif angle < 0.04:
+                                logo.left(abs(angle))
+                            move_counter = 0
+            
+            move_counter += 1
             cv2.imshow('depth', image_frame)
 
             # Process depth map to communicate to robot
