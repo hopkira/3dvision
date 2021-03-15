@@ -102,14 +102,6 @@ def stop():
                                   buffer=int(0))
     print("Stop done")
 
-def waitForMove2Finish():
-    ''' Waits until robot has finished move
-    '''
-    if not sim:
-        while(motors_moving() or buffer_full()):
-            time.sleep(0.1)
-    print("Move finished")
-
 def get_speed():
     ''' Returns speeds of motors
     '''
@@ -198,7 +190,6 @@ def forward(distance):
                                   speed2=0,
                                   distance2=int(abs(clicks/2)),
                                   buffer=0)
-    waitForMove2Finish()
 
 fd = fwd = forwards = forward
 
@@ -210,14 +201,14 @@ def backward(distance):
 back = bk = backwards = backward
 
 def left(angle):
-    '''Moves K9 right by 'angle' radians
+    '''Spins K9 by 'angle' radians
     '''
     global rc
-    fraction = angle/(2*math.pi)
-    clicks = TURNING_CIRCLE*fraction
-    turn_modifier = calc_turn_modifier(radius=0)
+    fraction = angle / ( 2 * math.pi )
+    clicks = TURNING_CIRCLE * fraction
+    turn_modifier = calc_turn_modifier(radius = 0)
     click_vel = calc_click_vel(clicks=clicks, turn_mod=turn_modifier)
-    accel = int(abs(click_vel*click_vel/(2*clicks/2)))
+    accel = int(abs(click_vel * click_vel / ( 2 * clicks / 2)))
     if not sim:
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                   accel=accel,
@@ -233,14 +224,13 @@ def left(angle):
                                   speed2=int(0),
                                   distance2=abs(int(round(clicks/2))),
                                   buffer=int(0))
-    print("Spinning...")
+    print("Spinning robot...")
     print("Speed=" + str(click_vel) + " Distance=" + str(clicks) + "\n")
-    waitForMove2Finish()
 
 lt = left
 
 def right(angle):
-    '''Moves K9 left by 'angle' radians
+    '''Moves K9 right by 'angle' radians
     '''
     left(-1*angle)
 
@@ -293,7 +283,6 @@ def circle(radius, extent):
     print("Moving in circle...")
     print("M1 Speed=" + str(click_vel1) + " Distance=" + str(distance1))
     print("M2 Speed=" + str(click_vel2) + " Distance=" + str(distance2) + "\n")
-    waitForMove2Finish()
 
 arc = circle
 

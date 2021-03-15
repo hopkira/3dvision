@@ -104,7 +104,7 @@ while True: # main loop until 'q' is pressed
             frame = packet.getData()
             # create a specific frame for display
             image_frame = np.copy(frame)
-            cv2.putText(image_frame, packet.stream_name, (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255))
+            cv2.putText(image_frame, packet.stream_name, (25, 25), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255))
             image_frame = (65535 // image_frame).astype(np.uint8)
             # colorize depth map
             image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
@@ -117,23 +117,23 @@ while True: # main loop until 'q' is pressed
                         label = labels[int(detection.label)]                 
                         score = int(detection.confidence * 100)  
                         cv2.rectangle(image_frame, pt1, pt2, color)
-                        cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)  
+                        cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_DUPLEX, 0.5, color, 2)  
                         x_1, y_1 = pt1
                         pt_t1 = x_1 + 5, y_1 + 60
                         angle = ( math.pi / 2 ) - math.atan2(detection.depth_z, detection.depth_x)
-                        cv2.putText(image_frame, 'x:' '{:7.2f}'.format(detection.depth_x) + ' m', pt_t1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+                        cv2.putText(image_frame, 'x:' '{:7.2f}'.format(detection.depth_x) + ' m', pt_t1, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                         pt_t2 = x_1 + 5, y_1 + 80
-                        cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+                        cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t2, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                         pt_t3 = x_1 + 5, y_1 + 100
-                        cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+                        cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t3, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                         pt_t4 = x_1 + 5, y_1 + 120
-                        cv2.putText(image_frame, 'angle: ' '{:2.4f}'.format(angle) + ' radians', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+                        cv2.putText(image_frame, 'angle: ' '{:2.4f}'.format(angle) + ' radians', pt_t4, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                         now_frame = time.time()
                         fps = 1/(now_frame - prev_frame) 
                         prev_frame = now_frame
                         fps = str(int(fps))
                         pt_t5 = x_1 + 5, y_1 + 140
-                        cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+                        cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                         if move_counter == 20:
                             move_counter = 0
                             if (angle > 0.04) :
