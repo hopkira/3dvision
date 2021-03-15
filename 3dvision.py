@@ -126,13 +126,17 @@ while True: # main loop until 'q' is pressed
                         pt_t3 = x_1 + 5, y_1 + 100
                         cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
                         pt_t4 = x_1 + 5, y_1 + 120
-                        cv2.putText(image_frame, 'angle:' '{:2.4f}'.format(angle) + ' radians', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+                        cv2.putText(image_frame, 'angle: ' '{:2.4f}'.format(angle) + ' radians', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
                         now_frame = time.time()
                         fps = 1/(now_frame - prev_frame) 
                         prev_frame = now_frame
                         fps = str(int(fps))
                         pt_t5 = x_1 + 5, y_1 + 140
                         cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
+                        if angle > 0.04:
+                            logo.left(abs(angle))
+                        elif angle < 0.04:
+                            logo.right(abs(angle))
 
             cv2.imshow('depth', image_frame)
 
