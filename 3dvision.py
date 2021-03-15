@@ -116,7 +116,7 @@ while True: # main loop until 'q' is pressed
                         label = labels[int(detection.label)]                 
                         score = int(detection.confidence * 100)  
                         cv2.rectangle(image_frame, pt1, pt2, color)
-                        cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  
+                        cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)  
                         x_1, y_1 = pt1
                         pt_t1 = x_1 + 5, y_1 + 60
                         cv2.putText(image_frame, 'x:' '{:7.2f}'.format(detection.depth_x) + ' m', pt_t1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
