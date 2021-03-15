@@ -5,6 +5,7 @@ import sys
 import time
 import cv2
 import json
+import math
 import depthai
 import numpy as np
 import pandas as pd
@@ -93,7 +94,9 @@ while True: # main loop until 'q' is pressed
         for detection in detections:
             if detection.label == 5: # we're looking for a bottle...
                 pass
-                # print('Bottle is ' + '{:.2f}'.format(detection.depth_z) + 'm away.')
+                #print('Bottle is ' + '{:.2f}'.format(detection.depth_z) + 'm away.')
+                #angle = (math.pi / 2) - math.atan2(detection.depth_z, detection.depth_x)
+                #print('Bottle is at ' + '{:.2f}'.format(angle) + ' radians.')
 
     for packet in data_packets:
         if packet.stream_name == 'depth':
@@ -103,7 +106,7 @@ while True: # main loop until 'q' is pressed
             cv2.putText(image_frame, packet.stream_name, (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255))
             image_frame = (65535 // image_frame).astype(np.uint8)
             # colorize depth map
-            image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
+            image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_AUTUMN)
             if detections is not None:
                 for detection in detections:
                     if detection.label == 5: # we're looking for a bottle...
@@ -122,12 +125,15 @@ while True: # main loop until 'q' is pressed
                         cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         pt_t3 = x_1 + 5, y_1 + 100
                         cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
-                        now_frame = time.time() 
+                        angle = (math.pi / 2) - math.atan2(detection.depth_z, detection.depth_x)
+                        pt_t4 = x_1 + 5, y_1 + 120
+                        cv2.putText(image_frame, 'angle:' '{:7.2f}'.format(detection.depth_z) + ' radians', pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        now_frame = time.time()
                         fps = 1/(now_frame - prev_frame) 
                         prev_frame = now_frame
                         fps = str(int(fps))
-                        pt_t4 = x_1 + 5, y_1 + 120
-                        cv2.putText(image_frame, 'fps: ' + fps, pt_t4, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        pt_t5 = x_1 + 5, y_1 + 140
+                        cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
 
             cv2.imshow('depth', image_frame)
 
