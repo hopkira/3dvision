@@ -133,10 +133,10 @@ while True: # main loop until 'q' is pressed
                         fps = str(int(fps))
                         pt_t5 = x_1 + 5, y_1 + 140
                         cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color)
-                        if angle > 0.04:
-                            logo.right(abs(angle))
-                        elif angle < 0.04:
-                            logo.left(abs(angle))
+                        #if angle > 0.04:
+                        #    logo.right(abs(angle))
+                        #elif angle < 0.04:
+                        #    logo.left(abs(angle))
 
             cv2.imshow('depth', image_frame)
 
