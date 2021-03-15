@@ -106,7 +106,7 @@ while True: # main loop until 'q' is pressed
             cv2.putText(image_frame, packet.stream_name, (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255))
             image_frame = (65535 // image_frame).astype(np.uint8)
             # colorize depth map
-            image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_RAINBOW)
+            image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
             if detections is not None:
                 for detection in detections:
                     if detection.label == 5: # we're looking for a bottle...
