@@ -29,7 +29,7 @@ config={
             # reducing resolution decreases min depth as
             # relative disparity is decreased
             'resolution_h': 400,
-            'fps': 10
+            'fps': 10   
         }
     }
 }
@@ -116,10 +116,13 @@ while True: # main loop until 'q' is pressed
                         cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)  
                         color1 = (0, 255, 0)
                         x_1, y_1 = pt1
+                        x_2, y_2 = pt2
+                        centre_x =(x_1 + x_2)/2
+                        centre_y = (y_1 + y_2)/2
                         pt_t1 = x_1 + 5, y_1 + 60
-                        cv2.putText(image_frame, 'x:' '{:7.2f}'.format(detection.depth_x) + ' m', pt_t1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        cv2.putText(image_frame, 'x:' '{:7.2f}'.format(centre_x) + ' m', pt_t1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         pt_t2 = x_1 + 5, y_1 + 80
-                        cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
+                        cv2.putText(image_frame, 'y:' '{:7.2f}'.format(centre_y) + ' m', pt_t2, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         pt_t3 = x_1 + 5, y_1 + 100
                         cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t3, cv2.FONT_HERSHEY_SIMPLEX, 0.5, color1)
                         now_frame = time.time() 
