@@ -108,7 +108,7 @@ while True: # main loop until 'q' is pressed
             image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
             if detections is not None:
                 for detection in detections:
-                    if detection.label == 5: # we're looking for a bottle...
+                    if detection.label == 15: # we're looking for a person...
                         pt1 = nn_to_depth_coord(detection.x_min, detection.y_min, nn2depth)
                         pt2 = nn_to_depth_coord(detection.x_max, detection.y_max, nn2depth)
                         color = (255, 255, 255) # bgr white
