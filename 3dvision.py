@@ -113,6 +113,7 @@ while True: # main loop until 'q' is pressed
                     if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5):
                         print("I have removed",str(labels[detection.label])," at ", str(detection.depth_z), "m")
                         detections.pop(i)
+                    pass
             num_boxes = len(detections)
             print("THere are now ", str(num_boxes), " detections")
             if num_boxes > 0:
