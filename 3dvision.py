@@ -113,8 +113,8 @@ while True: # main loop until 'q' is pressed
                     print("Found", str(i),"-",str(labels[detection.label]), "at", str(detection.depth_z), "m")
                     if (detection.label == 15 and 
                             detection.depth_z > 0.5 and 
-                            detection.depth_z < 1.5 and 
-                            detection.confidence > 0.7):
+                            detection.depth_z < .0 and 
+                            detection.confidence > 0.5):
                         valid_boxes.append(i)
                         print('Item',i,'is a valid person in range')
             num_boxes = len(valid_boxes)
