@@ -110,7 +110,8 @@ while True: # main loop until 'q' is pressed
                 for detection in detections:
                     if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5):
                         detections.remove(detection)
-            if detections is not None:
+            num_boxes = len(detections)
+            if num_boxes > 0:
                 x_min_sum = 0
                 x_max_sum = 0
                 y_min_sum = 0
