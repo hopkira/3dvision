@@ -69,7 +69,7 @@ conf_thr_slider_max = 255
 cv2.createTrackbar(trackbar_name, 'depth', conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
 cv2.setTrackbarPos(trackbar_name, 'depth', disparity_confidence_threshold)
 
-decimate =20
+decimate = 20
 max_dist = 4000.0
 height = 400.0
 width = 640.0
@@ -82,7 +82,7 @@ prev_frame = 0
 now_frame = 0
 
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
-y_bins = pd.interval_range(start= 0, end = 800, periods = 8)
+y_bins = pd.interval_range(start = 0, end = 800, periods = 8)
 
 while True: # main loop until 'q' is pressed
 
@@ -106,63 +106,58 @@ while True: # main loop until 'q' is pressed
             image_frame = (65535 // image_frame).astype(np.uint8)
             # colorize depth map
             image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
-
-
-
-
-
-
+            x_min_sum = 0
+            x_max_sum = 0
+            y_min_sum = 0
+            y_max_sum = 0
+            z_sum = 0
+            x_sum = 0
+            y_sum = 0
+            confidence_sum = 0
+            valid_boxes = 0
             if detections is not None:
                 print("There are", str(len(detections)),"objects found by cameras")
-                valid_boxes = []
-                for i, detection in enumerate(detections):
-                    print("Found", str(i),"-",str(labels[detection.label]), "at", str(detection.depth_z), "m with confidence",str(detection.confidence))
+                for detection in detections:
+                    print("Found",str(labels[detection.label]), "at", str(detection.depth_z), "m with confidence",str(detection.confidence))
                     if ((detection.label == 15) and 
                         (detection.depth_z > 0.5) and 
                         (detection.depth_z < 2.0) and 
                         (detection.confidence > 0.5)):
-                        valid_boxes.append(i)
-                        print('Item',i,'is a valid person in range')
-            num_boxes = len(valid_boxes)
-            print("THere are ", str(num_boxes), " valid detections")
-            if num_boxes > 0:
-                x_min_sum = 0
-                x_max_sum = 0
-                y_min_sum = 0
-                y_max_sum = 0
-                z_sum = 0
-                x_sum = 0
-                y_sum = 0
-                confidence_sum = 0
-                for box in valid_boxes:
-                    print("BBox for", str(labels[detections[box].label]),str(box), "at", str(detections[box].depth_z), "m")
-                    x_min_sum = x_min_sum + detections[box].x_min
-                    x_max_sum = x_max_sum + detections[box].x_max
-                    y_min_sum = y_min_sum + detections[box].y_min
-                    y_max_sum = y_max_sum + detections[box].y_max
-                    z_sum = z_sum + detections[box].depth_z
-                    x_sum = x_sum + detections[box].depth_x
-                    y_sum = y_sum + detections[box].depth_y
-                    confidence_sum = confidence_sum + detections[box].confidence
-                x_min_avg = x_min_sum / num_boxes
-                x_max_avg = x_max_sum / num_boxes
-                y_min_avg = y_min_sum / num_boxes
-                y_max_avg = y_max_sum / num_boxes
-                z_avg = z_sum / num_boxes
-                x_avg = x_sum / num_boxes
-                y_avg = y_sum / num_boxes
-                confidence_avg = confidence_sum / num_boxes
+                        valid_boxes += 1
+                        print('Found a valid person in range')
+                        x_min_sum = x_min_sum + detection.x_min
+                        x_max_sum = x_max_sum + detection.x_max
+                        y_min_sum = y_min_sum + detection.y_min
+                        y_max_sum = y_max_sum + detection.y_max
+                        z_sum = z_sum + detection.depth_z
+                        x_sum = x_sum + detection.depth_x
+                        y_sum = y_sum + detection.depth_y
+                        confidence_sum = confidence_sum + detection.confidence     
+            print("There are", str(valid_boxes), "valid detections")
+            if valid_boxes > 0
+                z_avg = z_sum / valid_boxes
+                x_avg = x_sum / valid_boxes
+                angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
+                if (angle > 0.04) :
+                    logo.right(abs(angle))
+                if (angle < -0.04) :
+                    logo.left(abs(angle))
+                y_avg = y_sum / valid_boxes
+                x_min_avg = x_min_sum / valid_boxes
+                x_max_avg = x_max_sum / valid_boxes
+                y_min_avg = y_min_sum / valid_boxes
+                y_max_avg = y_max_sum / valid_boxes
+                confidence_avg = confidence_sum / valid_boxes
                 # convert the resulting box into a bounding box
                 pt1 = nn_to_depth_coord(x_min_avg, y_min_avg, nn2depth)
                 pt2 = nn_to_depth_coord(x_max_avg, y_max_avg, nn2depth)
                 color = (255, 255, 255) # bgr white
-                label = "Person"               
+                label = "In Range Person"               
                 score = int(confidence_sum * 100)  
                 cv2.rectangle(image_frame, pt1, pt2, color)
-                cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_DUPLEX, 0.5, color, 2)  
+                cv2.putText(image_frame, str(score) + '% ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_DUPLEX, 0.5, color, 2)  
                 x_1, y_1 = pt1
                 pt_t1 = x_1 + 5, y_1 + 60
-                angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
                 cv2.putText(image_frame, 'x:' '{:7.2f}'.format(x_avg) + ' m', pt_t1, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t2 = x_1 + 5, y_1 + 80
                 cv2.putText(image_frame, 'y:' '{:7.2f}'.format(y_avg) + ' m', pt_t2, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
@@ -176,13 +171,7 @@ while True: # main loop until 'q' is pressed
                 fps = str(int(fps))
                 pt_t5 = x_1 + 5, y_1 + 140
                 cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
-                if (angle > 0.04) :
-                    logo.right(abs(angle))
-                if (angle < -0.04) :
-                    logo.left(abs(angle))
-        
             cv2.imshow('depth', image_frame)
-
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
             height, width = frame.shape
