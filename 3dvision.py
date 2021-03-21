@@ -108,39 +108,44 @@ while True: # main loop until 'q' is pressed
             image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
             if detections is not None:
                 print("There are", str(len(detections)),"objects found by cameras")
+                valid_boxes = []
                 for i, detection in enumerate(detections):
                     print("Found", str(i),"-",str(labels[detection.label]), "at", str(detection.depth_z), "m")
-                    if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5):
-                        print("I have removed",str(labels[detection.label])," at ", str(detection.depth_z), "m")
-                        detections.pop(i)
-                    pass
-            num_boxes = len(detections)
-            print("THere are now ", str(num_boxes), " detections")
+                    if (detection.label == 15 and 
+                            detection.depth_z > 0.5 and 
+                            detection.depth_z < 1.5 and 
+                            detection.confidence > 0.7):
+                        valid_boxes.append(i)
+                        print('Item',i,'is a valid person in range')
+            num_boxes = len(valid_boxes)
+            print("THere are ", str(num_boxes), " valid detections")
             if num_boxes > 0:
                 x_min_sum = 0
                 x_max_sum = 0
                 y_min_sum = 0
                 y_max_sum = 0
                 z_sum = 0
-                num_boxes = len(detections)
-                for detection in detections:
-                    print("BBox for", str(labels[detection.label]), "at", str(detection.depth_z), "m")
-                    x_min_sum = x_min_sum + detection.x_min
-                    x_max_sum = x_max_sum + detection.x_max
-                    y_min_sum = y_min_sum + detection.y_min
-                    y_max_sum = y_max_sum + detection.y_max
-                    z_sum = z_sum + detection.depth_z
+                confidence_sum = 0
+                for box in valid_boxes:
+                    print("BBox for", str(labels[detections[box].label]),str(box), "at", str(detections[box].depth_z), "m")
+                    x_min_sum = x_min_sum + detections[box].x_min
+                    x_max_sum = x_max_sum + detections[box].x_max
+                    y_min_sum = y_min_sum + detections[box].y_min
+                    y_max_sum = y_max_sum + detections[box].y_max
+                    z_sum = z_sum + detections[box].depth_z
+                    confidence_sum = confidence_sum + detections[box].confidence
                 x_min_avg = x_min_sum / num_boxes
                 x_max_avg = x_max_sum / num_boxes
                 y_min_avg = y_min_sum / num_boxes
                 y_max_avg = y_max_sum / num_boxes
                 z_avg = z_sum / num_boxes
+                confidence_avg = confidence_sum / num_boxes
                 # convert the resulting box into a bounding box
                 pt1 = nn_to_depth_coord(x_min_avg, y_min_avg, nn2depth)
                 pt2 = nn_to_depth_coord(x_max_avg, y_max_avg, nn2depth)
                 color = (255, 255, 255) # bgr white
-                label = labels[int(detection.label)]                 
-                score = int(detection.confidence * 100)  
+                label = "Person"               
+                score = int(confidence_sum * 100)  
                 cv2.rectangle(image_frame, pt1, pt2, color)
                 cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_DUPLEX, 0.5, color, 2)  
                 x_1, y_1 = pt1
