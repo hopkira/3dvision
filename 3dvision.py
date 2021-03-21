@@ -107,6 +107,7 @@ while True: # main loop until 'q' is pressed
             # colorize depth map
             image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
             if detections is not None:
+                print("There are ", str(len(detections))," found by cameras")
                 for detection in detections:
                     print(str(detection.label), 
                             str(type(detection.label)),
@@ -114,7 +115,9 @@ while True: # main loop until 'q' is pressed
                             str(type(detection.depth_z)))
                     if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5):
                         detections.remove(detection)
+                        print("I have removed ",str(detection))
             num_boxes = len(detections)
+            print("THere are now ", str(num_boxes), " detections")
             if num_boxes > 0:
                 x_min_sum = 0
                 x_max_sum = 0
