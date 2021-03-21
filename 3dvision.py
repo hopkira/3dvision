@@ -139,6 +139,8 @@ while True: # main loop until 'q' is pressed
                 y_min_avg = y_min_sum / num_boxes
                 y_max_avg = y_max_sum / num_boxes
                 z_avg = z_sum / num_boxes
+                x_centre = (x_min_avg + x_max_avg) / 2.0
+                y_centre = (x_min_avg + x_max_avg) / 2.0
                 confidence_avg = confidence_sum / num_boxes
                 # convert the resulting box into a bounding box
                 pt1 = nn_to_depth_coord(x_min_avg, y_min_avg, nn2depth)
@@ -150,12 +152,12 @@ while True: # main loop until 'q' is pressed
                 cv2.putText(image_frame, str(score) + ' ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_DUPLEX, 0.5, color, 2)  
                 x_1, y_1 = pt1
                 pt_t1 = x_1 + 5, y_1 + 60
-                angle = ( math.pi / 2 ) - math.atan2(z_avg, (x_min_avg + x_max_avg) / 2.0)
-                cv2.putText(image_frame, 'x:' '{:7.2f}'.format(detection.depth_x) + ' m', pt_t1, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
+                angle = ( math.pi / 2 ) - math.atan2(z_avg, x_centre)
+                cv2.putText(image_frame, 'x:' '{:7.2f}'.format(x_centre) + ' m', pt_t1, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t2 = x_1 + 5, y_1 + 80
-                cv2.putText(image_frame, 'y:' '{:7.2f}'.format(detection.depth_y) + ' m', pt_t2, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
+                cv2.putText(image_frame, 'y:' '{:7.2f}'.format(y_centre) + ' m', pt_t2, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t3 = x_1 + 5, y_1 + 100
-                cv2.putText(image_frame, 'z:' '{:7.2f}'.format(detection.depth_z) + ' m', pt_t3, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
+                cv2.putText(image_frame, 'z:' '{:7.2f}'.format(z_avg) + ' m', pt_t3, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t4 = x_1 + 5, y_1 + 120
                 cv2.putText(image_frame, 'angle: ' '{:2.4f}'.format(angle) + ' radians', pt_t4, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 now_frame = time.time()
