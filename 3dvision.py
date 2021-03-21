@@ -109,10 +109,10 @@ while True: # main loop until 'q' is pressed
             if detections is not None:
                 print("There are", str(len(detections)),"objects found by cameras")
                 for i, detection in enumerate(detections):
-                    print("Found", str(labels[detection.label]), "at", str(type(detection.depth_z)), "m")
-                    if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5):
-                        detections.pop(i)
+                    print("Found", str(i),"-",str(labels[detection.label]), "at", str(detection.depth_z), "m")
+                    if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5)
                         print("I have removed",str(labels[detection.label])," at ", str(detection.depth_z), "m")
+                        detections.pop(i)
             num_boxes = len(detections)
             print("THere are now ", str(num_boxes), " detections")
             if num_boxes > 0:
@@ -123,7 +123,7 @@ while True: # main loop until 'q' is pressed
                 z_sum = 0
                 num_boxes = len(detections)
                 for detection in detections:
-                    print("BBox for", str(labels[detection.label]), "at", str(type(detection.depth_z)), "m")
+                    print("BBox for", str(labels[detection.label]), "at", str(detection.depth_z), "m")
                     x_min_sum = x_min_sum + detection.x_min
                     x_max_sum = x_max_sum + detection.x_max
                     y_min_sum = y_min_sum + detection.y_min
