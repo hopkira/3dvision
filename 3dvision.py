@@ -110,7 +110,7 @@ while True: # main loop until 'q' is pressed
                 print("There are", str(len(detections)),"objects found by cameras")
                 for i, detection in enumerate(detections):
                     print("Found", str(i),"-",str(labels[detection.label]), "at", str(detection.depth_z), "m")
-                    if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5)
+                    if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5):
                         print("I have removed",str(labels[detection.label])," at ", str(detection.depth_z), "m")
                         detections.pop(i)
             num_boxes = len(detections)
