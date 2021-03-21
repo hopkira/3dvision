@@ -108,7 +108,10 @@ while True: # main loop until 'q' is pressed
             image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
             if detections is not None:
                 for detection in detections:
-                    print(str(detection.label), str(detection.depth_z))
+                    print(str(detection.label), 
+                            str(type(detection.label)),
+                            str(detection.depth_z),
+                            str(type(detection.depth_z)))
                     if (detection.label != 15 or detection.depth_z < 0.5 or detection.depth_z > 1.5):
                         detections.remove(detection)
             num_boxes = len(detections)
