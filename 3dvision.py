@@ -116,7 +116,9 @@ while True: # main loop until 'q' is pressed
                 y_min_sum = 0
                 y_max_sum = 0
                 z_sum = 0
+                print(str(detections))
                 num_boxes = len(detections)
+                print(str(len(detections))
                 for detection in detections:
                     x_min_sum = x_min_sum + detection.x_min
                     x_max_sum = x_max_sum + detection.x_max
