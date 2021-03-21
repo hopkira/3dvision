@@ -110,11 +110,11 @@ while True: # main loop until 'q' is pressed
                 print("There are", str(len(detections)),"objects found by cameras")
                 valid_boxes = []
                 for i, detection in enumerate(detections):
-                    print("Found", str(i),"-",str(labels[detection.label]), "at", str(detection.depth_z), "m")
-                    if (detection.label == 15 and 
-                            detection.depth_z > 0.5 and 
-                            detection.depth_z < .0 and 
-                            detection.confidence > 0.5):
+                    print("Found", str(i),"-",str(labels[detection.label]), "at", str(detection.depth_z), "m with confidence",str(detection.confidence))
+                    if ((detection.label == 15) and 
+                        (detection.depth_z > 0.5) and 
+                        (detection.depth_z < 2.0) and 
+                        detection.confidence > 0.5)):
                         valid_boxes.append(i)
                         print('Item',i,'is a valid person in range')
             num_boxes = len(valid_boxes)
