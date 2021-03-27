@@ -139,7 +139,7 @@ while True: # main loop until 'q' is pressed
             if valid_boxes > 0:
                 z_avg = z_sum / valid_boxes
                 x_avg = x_sum / valid_boxes
-                angle = (( math.pi / 2 ) - math.atan2(z_avg, x_avg) * prop_gain
+                angle = (( math.pi / 2 ) - math.atan2(z_avg, x_avg)) * prop_gain
                 if (angle > 0.04) :
                     logo.right(abs(angle))
                 if (angle < -0.04) :
