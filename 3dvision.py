@@ -150,13 +150,9 @@ while True: # main loop until 'q' is pressed
                 x = float(x_avg)
                 magnitude = (x * x) + (z * z)
                 distance = math.sqrt(magnitude)
-                #if abs(angle) > 0.04 :
-                #    logo.right(angle)
-                if x != 0.0 and distance > SAFETY_MARGIN :
-                    radius = (magnitude / (2 * x))
-                    print("Calling arc with radius",radius,"and extent",angle)
-                    logo.arc(radius = radius, extent = angle)
-                if x == 0.0 and distance > SAFETY_MARGIN :
+                if abs(angle) > 0.04 :
+                    logo.right(angle)
+                if abs(angle) <= 0.4 and distance > SAFETY_MARGIN :
                     print("Moving forward by",distance,"m")
                     logo.forwards(distance)
                 y_avg = y_sum / valid_boxes
@@ -188,11 +184,12 @@ while True: # main loop until 'q' is pressed
                 fps = str(int(fps))
                 pt_t5 = x_1 + 5, y_1 + 140
                 cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
-            #else:
-            #    searching = time.time() - last_seen
-            #    if searching < 5.0:
-            #        if abs(angle) > 0.04:
-            #            logo.right(angle)
+            else:
+                logo.stop()
+                searching = time.time() - last_seen
+                if searching < 5.0:
+                    if abs(angle) > 0.04:
+                        logo.right(angle)
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
