@@ -56,6 +56,7 @@ def nn_to_depth_coord(x, y, nn2depth):
 
 detections = []
 angle = 0.0
+last_seen = 0.0
 
 disparity_confidence_threshold = 170
 
@@ -137,6 +138,7 @@ while True: # main loop until 'q' is pressed
                         confidence_sum = confidence_sum + detection.confidence     
             #print("There are", str(valid_boxes), "valid detections")
             if valid_boxes > 0:
+                last_seen = time.time()
                 z_avg = z_sum / valid_boxes
                 x_avg = x_sum / valid_boxes
                 angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
@@ -172,9 +174,9 @@ while True: # main loop until 'q' is pressed
                 pt_t5 = x_1 + 5, y_1 + 140
                 cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
             else:
-                if angle != 0.0 :
+                searching = time.time() - last_seen
+                if searching < 5.0 :
                     logo.right(angle)
-                    angle = 0.0
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
