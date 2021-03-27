@@ -152,10 +152,13 @@ while True: # main loop until 'q' is pressed
                 distance = math.sqrt(magnitude)
                 #if abs(angle) > 0.04 :
                 #    logo.right(angle)
-                if abs(angle) > 0.04 or distance > SAFETY_MARGIN :
+                if x != 0.0 and distance > SAFETY_MARGIN :
                     radius = (magnitude / (2 * x))
                     print("Calling arc with radius",radius,"and extent",angle)
                     logo.arc(radius = radius, extent = angle)
+                if x == 0.0 and distance > SAFETY_MARGIN :
+                    print("Moving forward by",distance,"m")
+                    logo.forwards(distance)
                 y_avg = y_sum / valid_boxes
                 x_min_avg = x_min_sum / valid_boxes
                 x_max_avg = x_max_sum / valid_boxes
