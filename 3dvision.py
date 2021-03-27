@@ -180,9 +180,9 @@ while True: # main loop until 'q' is pressed
                         logo.right(angle)
                     else:
                         if angle >= 0.0:
-                            logo.right(0.785)
-                        else:
                             logo.left(0.785)
+                        else:
+                            logo.right(0.785)
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
