@@ -152,7 +152,7 @@ while True: # main loop until 'q' is pressed
                 distance = math.sqrt(magnitude)
                 #if abs(angle) > 0.04 :
                 #    logo.right(angle)
-                if abs(angle) > 0.04 or distance > (MIN_DIST + SAFETY_MARGIN) :
+                if abs(angle) > 0.04 or distance > SAFETY_MARGIN :
                     radius = (magnitude / (2 * x))
                     logo.arc(radius = radius, extent = angle)
                 y_avg = y_sum / valid_boxes
