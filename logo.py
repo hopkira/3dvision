@@ -246,8 +246,12 @@ def arc(radius, extent):
 
     '''
     global rc
-    distance1 = int(abs(extent * (radius - HALF_WHEEL_GAP) / CLICK2METRES))
-    distance2 = int(abs(extent * (radius + HALF_WHEEL_GAP) / CLICK2METRES))
+    if extent > 0.0:
+        distance1 = int(abs(extent * (radius - HALF_WHEEL_GAP) / CLICK2METRES))
+        distance2 = int(abs(extent * (radius + HALF_WHEEL_GAP) / CLICK2METRES))
+    else:
+        distance2 = int(abs(extent * (radius - HALF_WHEEL_GAP) / CLICK2METRES))
+        distance1 = int(abs(extent * (radius + HALF_WHEEL_GAP) / CLICK2METRES))
     turn_mod1 = calc_turn_modifier(radius - HALF_WHEEL_GAP)
     turn_mod2 = calc_turn_modifier(radius + HALF_WHEEL_GAP)
     click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod1)
