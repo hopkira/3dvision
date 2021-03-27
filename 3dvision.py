@@ -154,6 +154,7 @@ while True: # main loop until 'q' is pressed
                 #    logo.right(angle)
                 if abs(angle) > 0.04 or distance > SAFETY_MARGIN :
                     radius = (magnitude / (2 * x))
+                    print("Calling arc with radius",radius,"and extent",angle)
                     logo.arc(radius = radius, extent = angle)
                 y_avg = y_sum / valid_boxes
                 x_min_avg = x_min_sum / valid_boxes
