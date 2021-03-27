@@ -59,8 +59,8 @@ angle = 0.0
 last_seen = 0.05
 MIN_DIST = 0.5
 MAX_DIST = 4.0
-CONF = 0.5
-SAFETY_MARGIN = 0.5
+CONF = 0.7
+SAFETY_MARGIN = 0.75
 
 disparity_confidence_threshold = 170
 
@@ -152,7 +152,7 @@ while True: # main loop until 'q' is pressed
                 distance = math.sqrt(magnitude)
                 if abs(angle) > 0.04 :
                     logo.right(angle)
-                if abs(angle) <= 0.4 and z > SAFETY_MARGIN :
+                if abs(angle) <= 0.04 and z > SAFETY_MARGIN :
                     print("Moving forward by",distance,"m")
                     logo.forwards(distance)
                 y_avg = y_sum / valid_boxes
