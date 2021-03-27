@@ -55,6 +55,7 @@ def nn_to_depth_coord(x, y, nn2depth):
     return x_depth, y_depth
 
 detections = []
+angle = 0
 
 disparity_confidence_threshold = 170
 
