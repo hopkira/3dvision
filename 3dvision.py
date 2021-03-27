@@ -146,15 +146,15 @@ while True: # main loop until 'q' is pressed
                 z_avg = z_sum / valid_boxes # distance
                 x_avg = x_sum / valid_boxes # x axis displacement
                 angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
-                z = float(z_avg - MIN_DIST)
+                z = float(z_avg)
                 x = float(x_avg)
                 magnitude = (x * x) + (z * z)
                 distance = math.sqrt(magnitude)
-                if abs(angle) > 0.04 :
+                if abs(angle) > 0.07 :
                     logo.right(angle)
-                if abs(angle) <= 0.07 and z > SAFETY_MARGIN :
+                else if z > (SAFETY_MARGIN + MIN_DIST) :
                     print("Moving forward by",z,"m")
-                    logo.forwards(z)
+                    logo.forwards(z - (SAFETY_MARGIN + MIN_DIST))
                 y_avg = y_sum / valid_boxes
                 x_min_avg = x_min_sum / valid_boxes
                 x_max_avg = x_max_sum / valid_boxes
