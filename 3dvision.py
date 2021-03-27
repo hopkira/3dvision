@@ -150,7 +150,7 @@ while True: # main loop until 'q' is pressed
                 x = float(x_avg)
                 magnitude = (x * x) + (z * z)
                 distance = math.sqrt(magnitude)
-                if abs(angle) > 0.04 :
+                if abs(angle) > 0.17 :
                     logo.right(angle)
                 elif z > (SAFETY_MARGIN + MIN_DIST) :
                     print("Moving forward by",z,"m")
