@@ -84,6 +84,8 @@ now_frame = 0
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start = 0, end = 800, periods = 8)
 
+prop_gain = 2.0
+
 while True: # main loop until 'q' is pressed
 
     nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
@@ -137,7 +139,7 @@ while True: # main loop until 'q' is pressed
             if valid_boxes > 0:
                 z_avg = z_sum / valid_boxes
                 x_avg = x_sum / valid_boxes
-                angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
+                angle = (( math.pi / 2 ) - math.atan2(z_avg, x_avg) * prop_gain
                 if (angle > 0.04) :
                     logo.right(abs(angle))
                 if (angle < -0.04) :
