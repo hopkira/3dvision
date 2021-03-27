@@ -136,7 +136,7 @@ while True: # main loop until 'q' is pressed
                         x_max_sum = x_max_sum + detection.x_max
                         y_min_sum = y_min_sum + detection.y_min
                         y_max_sum = y_max_sum + detection.y_max
-                        z_min = min(z_min + detection.depth_z)
+                        z_min = min(z_min, float(detection.depth_z))
                         x_sum = x_sum + detection.depth_x
                         y_sum = y_sum + detection.depth_y
                         confidence_sum = confidence_sum + detection.confidence     
@@ -174,7 +174,7 @@ while True: # main loop until 'q' is pressed
                 pt_t2 = x_1 + 5, y_1 + 80
                 cv2.putText(image_frame, 'y:' '{:7.2f}'.format(y_avg) + ' m', pt_t2, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t3 = x_1 + 5, y_1 + 100
-                cv2.putText(image_frame, 'z:' '{:7.2f}'.format(z_avg) + ' m', pt_t3, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
+                cv2.putText(image_frame, 'z:' '{:7.2f}'.format(z_min) + ' m', pt_t3, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t4 = x_1 + 5, y_1 + 120
                 cv2.putText(image_frame, 'angle: ' '{:2.4f}'.format(angle) + ' radians', pt_t4, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 now_frame = time.time()
