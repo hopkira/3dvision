@@ -58,7 +58,7 @@ detections = []
 angle = 0.0
 last_seen = 0.05
 MIN_DIST = 0.5
-MAX_DIST = 2.0
+MAX_DIST = 4.0
 CONF = 0.5
 SAFETY_MARGIN = 0.2
 
