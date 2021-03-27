@@ -117,7 +117,7 @@ while True: # main loop until 'q' is pressed
             x_max_sum = 0
             y_min_sum = 0
             y_max_sum = 0
-            z_sum = 0
+            z_min = MAX_DIST
             x_sum = 0
             y_sum = 0
             confidence_sum = 0
@@ -136,21 +136,20 @@ while True: # main loop until 'q' is pressed
                         x_max_sum = x_max_sum + detection.x_max
                         y_min_sum = y_min_sum + detection.y_min
                         y_max_sum = y_max_sum + detection.y_max
-                        z_sum = z_sum + detection.depth_z
+                        z_min = min(z_min + detection.depth_z)
                         x_sum = x_sum + detection.depth_x
                         y_sum = y_sum + detection.depth_y
                         confidence_sum = confidence_sum + detection.confidence     
             #print("There are", str(valid_boxes), "valid detections")
             if valid_boxes > 0:
                 last_seen = time.time()
-                z_avg = z_sum / valid_boxes # distance
                 x_avg = x_sum / valid_boxes # x axis displacement
-                angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
-                z = float(z_avg)
+                angle = ( math.pi / 2 ) - math.atan2(z_min, x_avg)
+                z = float(z_min)
                 x = float(x_avg)
                 magnitude = (x * x) + (z * z)
                 distance = math.sqrt(magnitude)
-                if abs(angle) > 0.17 :
+                if abs(angle) > 0.2 :
                     logo.right(angle)
                 elif z > (SAFETY_MARGIN + MIN_DIST) :
                     print("Moving forward by",z,"m")
