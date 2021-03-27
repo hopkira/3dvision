@@ -141,7 +141,7 @@ while True: # main loop until 'q' is pressed
                 x_avg = x_sum / valid_boxes
                 angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
                 if abs(angle) > 0.04 :
-                    logo.left(angle)
+                    logo.right(angle)
                 y_avg = y_sum / valid_boxes
                 x_min_avg = x_min_sum / valid_boxes
                 x_max_avg = x_max_sum / valid_boxes
@@ -173,7 +173,7 @@ while True: # main loop until 'q' is pressed
                 cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
             else:
                 if angle != 0.0 :
-                    logo.left(angle)
+                    logo.right(angle)
                     angle = 0.0
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
