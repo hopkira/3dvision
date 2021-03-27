@@ -134,7 +134,7 @@ while True: # main loop until 'q' is pressed
                         y_sum = y_sum + detection.depth_y
                         confidence_sum = confidence_sum + detection.confidence     
             print("There are", str(valid_boxes), "valid detections")
-            if valid_boxes > 0
+            if valid_boxes > 0:
                 z_avg = z_sum / valid_boxes
                 x_avg = x_sum / valid_boxes
                 angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
