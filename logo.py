@@ -260,11 +260,6 @@ def circle(radius, extent):
     #
     # if there's enough distanc then acclerate, maintain and decelerate
     # if not, then just decelerate
-
-    if abs(curr_click_vel1) >= abs(curr_click_vel1):
-        X
-
-
     if not sim:
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                   accel=int(ACCELERATION*turn_mod1),
