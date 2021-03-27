@@ -57,6 +57,9 @@ def nn_to_depth_coord(x, y, nn2depth):
 detections = []
 angle = 0.0
 last_seen = 0.05
+MIN_DIST = 0.5
+MAX_DIST = 2.0
+CONF = 0.5
 
 disparity_confidence_threshold = 170
 
@@ -123,9 +126,9 @@ while True: # main loop until 'q' is pressed
                 for detection in detections:
                     #print("Found",str(labels[detection.label]), "at", str(detection.depth_z), "m with confidence",str(detection.confidence))
                     if ((detection.label == 15) and 
-                        (detection.depth_z > 0.5) and 
-                        (detection.depth_z < 2.0) and 
-                        (detection.confidence > 0.5)):
+                        (detection.depth_z > MIN_DIST) and 
+                        (detection.depth_z < MAX_DIST) and 
+                        (detection.confidence > CONF)):
                         valid_boxes += 1
                         #print('Found a valid person in range')
                         x_min_sum = x_min_sum + detection.x_min
@@ -139,11 +142,17 @@ while True: # main loop until 'q' is pressed
             #print("There are", str(valid_boxes), "valid detections")
             if valid_boxes > 0:
                 last_seen = time.time()
-                z_avg = z_sum / valid_boxes
-                x_avg = x_sum / valid_boxes
+                z_avg = z_sum / valid_boxes # distance
+                x_avg = x_sum / valid_boxes # x axis displacement
                 angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
-                if abs(angle) > 0.04 :
-                    logo.right(angle)
+                z = z_avg - MIN_DIST
+                magnitude = (x_avg * x_avg) + (z * z)
+                distance = Math.sqrt(magnitude)
+                #if abs(angle) > 0.04 :
+                #    logo.right(angle)
+                if distance > 0.04:
+                    radius = magnitude / (2 * x_avg)
+                    logo.circle(radius = radius, extent = angle)
                 y_avg = y_sum / valid_boxes
                 x_min_avg = x_min_sum / valid_boxes
                 x_max_avg = x_max_sum / valid_boxes
