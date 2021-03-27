@@ -185,7 +185,7 @@ while True: # main loop until 'q' is pressed
                 pt_t5 = x_1 + 5, y_1 + 140
                 cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
             else:
-                logo.stop()
+                logo.stop(0.0)
                 searching = time.time() - last_seen
                 if searching < 5.0:
                     if abs(angle) > 0.04:

@@ -87,7 +87,7 @@ def calc_circle_arc(x_pos, y_pos):
     extent = math.asin(y_pos/radius)
     return radius, extent
 
-def stop():
+def stop(accel):
     '''Lock motors to stop motion
     '''
     global rc
