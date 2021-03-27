@@ -176,8 +176,8 @@ while True: # main loop until 'q' is pressed
             else:
                 searching = time.time() - last_seen
                 if searching < 5.0:
-                    if abs(angle/searching) > 0.04:
-                        logo.right(angle/searching)
+                    if abs(angle) > 0.04:
+                        logo.right(angle)
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
