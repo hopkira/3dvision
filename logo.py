@@ -259,18 +259,18 @@ def arc(radius, extent):
         rc.SpeedAccelDistanceM1M2_2(address=rc_address,
                                     accel1=accel1,
                                     speed1=int(round(click_vel1)),
-                                    distance1=abs(int(round(distance1/2)),
+                                    distance1=abs(int(round(distance1/2))),
                                     accel2=accel2,
                                     speed2=int(round(click_vel2)),
-                                    distance2=abs(int(round(distance2/2)),
+                                    distance2=abs(int(round(distance2/2))),
                                     buffer=int(1))
         rc.SpeedAccelDistanceM1M2_2(address=rc_address,
                                     accel=accel1,
                                     speed1=int(0),
-                                    distance1=int(abs(distance1/2)),
+                                    distance1=abs(int(round(distance1/2))),
                                     accel2=accel2,
                                     speed2=int(0),
-                                    distance2=int(abs(distance2/2)),
+                                    distance2=abs(int(round(distance2/2))),
                                     buffer=int(0))
     print("Moving in arc...")
     print("M1 Speed=" + str(click_vel1) + " Distance=" + str(distance1))
