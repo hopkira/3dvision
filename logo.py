@@ -248,28 +248,20 @@ def circle(radius, extent):
     global rc
     distance1 = int(extent*(radius-HALF_WHEEL_GAP)/CLICK2METRES)
     distance2 = int(extent*(radius+HALF_WHEEL_GAP)/CLICK2METRES)
-    turn_mod = calc_turn_modifier(radius)
-    curr_click_vel1, curr_click_vel2 = get_speed()
-    click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod)
-    click_vel2 = calc_click_vel(clicks=distance2, turn_mod=turn_mod)
-    # given the current velocity and distance
-    # work out how far it would take to accelerate OR
-    # decelerate to max velocity,
-    # maintain max speeed
-    # then decelerate given ACCELERATION
-    #
-    # if there's enough distanc then acclerate, maintain and decelerate
-    # if not, then just decelerate
+    turn_mod1 = calc_turn_modifier(radius-HALF_WHEEL_GAP)
+    turn_mod2 = calc_turn_modifier(radius+HALF_WHEEL_GAP)
+    click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod1)
+    click_vel2 = calc_click_vel(clicks=distance2, turn_mod=turn_mod2)
     if not sim:
         rc.SpeedAccelDistanceM1M2(address=rc_address,
-                                  accel=int(ACCELERATION),
+                                  accel=int(ACCELERATION*turn_mod1),
                                   speed1=int(-click_vel1),
                                   distance1=int(abs(distance1/2)),
                                   speed2=int(click_vel2),
                                   distance2=int(abs(distance2/2)),
                                   buffer=int(1))
         rc.SpeedAccelDistanceM1M2(address=rc_address,
-                                  accel=int(ACCELERATION),
+                                  accel=int(ACCELERATION*turn_mod2),
                                   speed1=int(0),
                                   distance1=int(abs(distance1/2)),
                                   speed2=int(0),
