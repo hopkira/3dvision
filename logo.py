@@ -99,7 +99,7 @@ def stop():
                                   distance1=0,
                                   speed2=0,
                                   distance2=0,
-                                  buffer=int(0))
+                                  buffer=int(1))
     print("Stop done")
 
 def get_speed():
