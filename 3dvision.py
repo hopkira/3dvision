@@ -60,7 +60,7 @@ last_seen = 0.05
 MIN_DIST = 0.5
 MAX_DIST = 4.0
 CONF = 0.5
-SAFETY_MARGIN = 0.3
+SAFETY_MARGIN = 0.5
 
 disparity_confidence_threshold = 170
 
