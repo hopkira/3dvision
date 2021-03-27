@@ -255,6 +255,7 @@ def arc(radius, extent):
     accel1 = int(abs(click_vel1 * click_vel1 / ( 2 * distance1 / 2)))
     accel2 = int(abs(click_vel2 * click_vel2 / ( 2 * distance2 / 2)))
     accel = max(accel1,accel2)
+    if not sim:
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                     accel=accel,
                                     speed1=int(round(click_vel1)),
