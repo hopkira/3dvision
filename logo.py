@@ -256,19 +256,17 @@ def arc(radius, extent):
     accel2 = int(abs(click_vel2 * click_vel2 / ( 2 * distance2 / 2)))
     accel = int((accel1 + accel2)/2)
     if not sim:
-        rc.SpeedAccelDistanceM1M2_2(address=rc_address,
-                                    accel1=accel1,
+        rc.SpeedAccelDistanceM1M2(address=rc_address,
+                                    accel=accel,
                                     speed1=int(round(click_vel1)),
                                     distance1=abs(int(round(distance1/2))),
-                                    accel2=accel2,
                                     speed2=int(round(click_vel2)),
                                     distance2=abs(int(round(distance2/2))),
                                     buffer=int(1))
-        rc.SpeedAccelDistanceM1M2_2(address=rc_address,
-                                    accel=accel1,
+        rc.SpeedAccelDistanceM1M2(address=rc_address,
+                                    accel=accel,
                                     speed1=int(0),
                                     distance1=abs(int(round(distance1/2))),
-                                    accel2=accel2,
                                     speed2=int(0),
                                     distance2=abs(int(round(distance2/2))),
                                     buffer=int(0))
