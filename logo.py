@@ -246,29 +246,28 @@ def arc(radius, extent):
 
     '''
     global rc
-    distance1 = int(extent * (radius - HALF_WHEEL_GAP) / CLICK2METRES)
-    distance2 = int(extent * (radius + HALF_WHEEL_GAP) / CLICK2METRES)
+    distance1 = int(abs(extent * (radius - HALF_WHEEL_GAP) / CLICK2METRES))
+    distance2 = int(abs(extent * (radius + HALF_WHEEL_GAP) / CLICK2METRES))
     turn_mod1 = calc_turn_modifier(radius - HALF_WHEEL_GAP)
     turn_mod2 = calc_turn_modifier(radius + HALF_WHEEL_GAP)
     click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod1)
     click_vel2 = calc_click_vel(clicks=distance2, turn_mod=turn_mod2)
     accel1 = int(abs(click_vel1 * click_vel1 / ( 2 * distance1 / 2)))
     accel2 = int(abs(click_vel2 * click_vel2 / ( 2 * distance2 / 2)))
-    accel = int((accel1 + accel2)/2)
-    if not sim:
+    accel = max(accel1,accel2)
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                     accel=accel,
                                     speed1=int(round(click_vel1)),
-                                    distance1=abs(int(round(distance1/2))),
+                                    distance1=int(round(distance1/2)),
                                     speed2=int(round(click_vel2)),
-                                    distance2=abs(int(round(distance2/2))),
+                                    distance2=int(round(distance2/2)),
                                     buffer=int(1))
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                     accel=accel,
                                     speed1=int(0),
-                                    distance1=abs(int(round(distance1/2))),
+                                    distance1=int(round(distance1/2)),
                                     speed2=int(0),
-                                    distance2=abs(int(round(distance2/2))),
+                                    distance2=int(round(distance2/2)),
                                     buffer=int(0))
     print("Moving in arc...")
     print("M1 Speed=" + str(click_vel1) + " Distance=" + str(distance1))
