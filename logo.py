@@ -145,9 +145,9 @@ def calc_click_vel(clicks, turn_mod):
     turn_mod -- a modifier based on radius of turn
 
     '''
-    sign_modifier = 1
+    sign_modifier = 1.0
     if (clicks < 0):
-        sign_modifier = -1
+        sign_modifier = -1.0
     click_vel = math.sqrt(abs(float(2*clicks*ACCELERATION*turn_mod)))
     if (click_vel > TOPSPEED*turn_mod):
         click_vel = TOPSPEED*turn_mod
@@ -252,10 +252,9 @@ def arc(radius, extent):
     else:
         distance2 = int(abs(extent * (radius - HALF_WHEEL_GAP) / CLICK2METRES))
         distance1 = int(abs(extent * (radius + HALF_WHEEL_GAP) / CLICK2METRES))
-    turn_mod1 = calc_turn_modifier(radius - HALF_WHEEL_GAP)
-    turn_mod2 = calc_turn_modifier(radius + HALF_WHEEL_GAP)
-    click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod1)
-    click_vel2 = calc_click_vel(clicks=distance2, turn_mod=turn_mod2)
+    turn_mod = calc_turn_modifier(radius)
+    click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod)
+    click_vel2 = calc_click_vel(clicks=distance2, turn_mod=turn_mod)
     accel1 = int(abs(click_vel1 * click_vel1 / ( 2 * distance1 / 2)))
     accel2 = int(abs(click_vel2 * click_vel2 / ( 2 * distance2 / 2)))
     accel = max(accel1,accel2)
