@@ -60,6 +60,7 @@ last_seen = 0.05
 MIN_DIST = 0.5
 MAX_DIST = 2.0
 CONF = 0.5
+SAFETY_MARGIN = 0.2
 
 disparity_confidence_threshold = 170
 
@@ -151,7 +152,7 @@ while True: # main loop until 'q' is pressed
                 distance = math.sqrt(magnitude)
                 #if abs(angle) > 0.04 :
                 #    logo.right(angle)
-                if distance > 0.04:
+                if distance > 0.04 and z > SAFETY_MARGIN:
                     radius = magnitude / (2 * x)
                     logo.arc(radius = radius, extent = angle)
                 y_avg = y_sum / valid_boxes
