@@ -59,10 +59,10 @@ angle = 0.0
 last_seen = 0.05
 MIN_DIST = 0.5
 MAX_DIST = 4.0
-CONF = 0.7
+CONF = 0.6
 SAFETY_MARGIN = 0.75
 
-disparity_confidence_threshold = 170
+disparity_confidence_threshold = 130
 
 def on_trackbar_change(value):
     device.send_disparity_confidence_threshold(value)
@@ -152,9 +152,9 @@ while True: # main loop until 'q' is pressed
                 distance = math.sqrt(magnitude)
                 if abs(angle) > 0.04 :
                     logo.right(angle)
-                if abs(angle) <= 0.04 and z > SAFETY_MARGIN :
-                    print("Moving forward by",distance,"m")
-                    logo.forwards(distance)
+                if abs(angle) <= 0.07 and z > SAFETY_MARGIN :
+                    print("Moving forward by",z,"m")
+                    logo.forwards(z)
                 y_avg = y_sum / valid_boxes
                 x_min_avg = x_min_sum / valid_boxes
                 x_max_avg = x_max_sum / valid_boxes
