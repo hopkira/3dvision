@@ -150,7 +150,7 @@ while True: # main loop until 'q' is pressed
                 x = float(x_avg)
                 magnitude = (x * x) + (z * z)
                 distance = math.sqrt(magnitude)
-                if abs(angle) > 0.07 :
+                if abs(angle) > 0.04 :
                     logo.right(angle)
                 elif z > (SAFETY_MARGIN + MIN_DIST) :
                     print("Moving forward by",z,"m")
@@ -189,7 +189,7 @@ while True: # main loop until 'q' is pressed
                 searching = time.time() - last_seen
                 if searching < 5.0:
                     if abs(angle) > 0.04:
-                        logo.right(angle)
+                        logo.right(0.04)
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
