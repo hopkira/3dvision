@@ -56,7 +56,7 @@ def nn_to_depth_coord(x, y, nn2depth):
 
 detections = []
 
-disparity_confidence_threshold = 130
+disparity_confidence_threshold = 170
 
 def on_trackbar_change(value):
     device.send_disparity_confidence_threshold(value)
@@ -116,15 +116,15 @@ while True: # main loop until 'q' is pressed
             confidence_sum = 0
             valid_boxes = 0
             if detections is not None:
-                print("There are", str(len(detections)),"objects found by cameras")
+                #print("There are", str(len(detections)),"objects found by cameras")
                 for detection in detections:
-                    print("Found",str(labels[detection.label]), "at", str(detection.depth_z), "m with confidence",str(detection.confidence))
+                    #print("Found",str(labels[detection.label]), "at", str(detection.depth_z), "m with confidence",str(detection.confidence))
                     if ((detection.label == 15) and 
                         (detection.depth_z > 0.5) and 
                         (detection.depth_z < 2.0) and 
                         (detection.confidence > 0.5)):
                         valid_boxes += 1
-                        print('Found a valid person in range')
+                        #print('Found a valid person in range')
                         x_min_sum = x_min_sum + detection.x_min
                         x_max_sum = x_max_sum + detection.x_max
                         y_min_sum = y_min_sum + detection.y_min
@@ -133,7 +133,7 @@ while True: # main loop until 'q' is pressed
                         x_sum = x_sum + detection.depth_x
                         y_sum = y_sum + detection.depth_y
                         confidence_sum = confidence_sum + detection.confidence     
-            print("There are", str(valid_boxes), "valid detections")
+            #print("There are", str(valid_boxes), "valid detections")
             if valid_boxes > 0:
                 z_avg = z_sum / valid_boxes
                 x_avg = x_sum / valid_boxes
