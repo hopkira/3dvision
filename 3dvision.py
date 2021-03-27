@@ -175,14 +175,14 @@ while True: # main loop until 'q' is pressed
                 cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
             else:
                 searching = time.time() - last_seen
-                if searching < 5.0
-                    if abs(angle) > 0.5:
+                if searching < 5.0:
+                    if abs(angle) > 0.785:
                         logo.right(angle)
                     else:
                         if angle >= 0.0:
-                            logo.right(0.5)
+                            logo.right(0.785)
                         else:
-                            logo.left(0.5)
+                            logo.left(0.785)
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
