@@ -236,7 +236,7 @@ def right(angle):
 
 rt = right
 
-def circle(radius, extent):
+def arc(radius, extent):
     '''Moves K9 in a circle or arc
 
     Arguments:
@@ -246,32 +246,40 @@ def circle(radius, extent):
 
     '''
     global rc
-    distance1 = int(extent*(radius-HALF_WHEEL_GAP)/CLICK2METRES)
-    distance2 = int(extent*(radius+HALF_WHEEL_GAP)/CLICK2METRES)
-    turn_mod1 = calc_turn_modifier(radius-HALF_WHEEL_GAP)
-    turn_mod2 = calc_turn_modifier(radius+HALF_WHEEL_GAP)
+    distance1 = int(extent * (radius - HALF_WHEEL_GAP) / CLICK2METRES)
+    distance2 = int(extent * (radius + HALF_WHEEL_GAP) / CLICK2METRES)
+    turn_mod1 = calc_turn_modifier(radius - HALF_WHEEL_GAP)
+    turn_mod2 = calc_turn_modifier(radius + HALF_WHEEL_GAP)
     click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod1)
     click_vel2 = calc_click_vel(clicks=distance2, turn_mod=turn_mod2)
+    accel1 = int(abs(click_vel1 * click_vel1 / ( 2 * distance1 / 2)))
+    accel2 = int(abs(click_vel2 * click_vel2 / ( 2 * distance2 / 2)))
+    accel = int((accel1 + accel2)/2)
     if not sim:
-        rc.SpeedAccelDistanceM1M2(address=rc_address,
-                                  accel=int(ACCELERATION*turn_mod1),
-                                  speed1=int(-click_vel1),
-                                  distance1=int(abs(distance1/2)),
-                                  speed2=int(click_vel2),
-                                  distance2=int(abs(distance2/2)),
+
+def SpeedAccelDistanceM1M2_2(self,address,accel1,speed1,distance1,accel2,speed2,distance2,buffer):
+
+        rc.SpeedAccelDistanceM1M2_2(address=rc_address,
+                                  accel1=accel1,
+                                  speed1=int(round(click_vel1)),
+                                  distance1=abs(int(round(distance1/2)),
+                                  accel2=accel2,
+                                  speed2=int(round(click_vel2)),
+                                  distance2=abs(int(round(distance2/2)),
                                   buffer=int(1))
-        rc.SpeedAccelDistanceM1M2(address=rc_address,
-                                  accel=int(ACCELERATION*turn_mod2),
+        rc.SpeedAccelDistanceM1M2_2(address=rc_address,
+                                  accel=accel1,
                                   speed1=int(0),
                                   distance1=int(abs(distance1/2)),
+                                  accel2=accel2,
                                   speed2=int(0),
                                   distance2=int(abs(distance2/2)),
                                   buffer=int(0))
-    print("Moving in circle...")
+    print("Moving in arc...")
     print("M1 Speed=" + str(click_vel1) + " Distance=" + str(distance1))
     print("M2 Speed=" + str(click_vel2) + " Distance=" + str(distance2) + "\n")
 
-arc = circle
+circle = arc
 
 def init_rc():
     global rc
