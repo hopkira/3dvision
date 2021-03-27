@@ -55,7 +55,7 @@ def nn_to_depth_coord(x, y, nn2depth):
     return x_depth, y_depth
 
 detections = []
-angle = 0
+angle = 0.0
 
 disparity_confidence_threshold = 170
 
@@ -172,8 +172,9 @@ while True: # main loop until 'q' is pressed
                 pt_t5 = x_1 + 5, y_1 + 140
                 cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
             else:
-                logo.left(angle)
-                angle = 0
+                if angle != 0.0 :
+                    logo.left(angle)
+                    angle = 0.0
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
