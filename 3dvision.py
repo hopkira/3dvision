@@ -153,7 +153,7 @@ while True: # main loop until 'q' is pressed
                 #    logo.right(angle)
                 if distance > 0.04:
                     radius = magnitude / (2 * x)
-                    logo.circle(radius = radius, extent = angle)
+                    logo.arc(radius = radius, extent = angle)
                 y_avg = y_sum / valid_boxes
                 x_min_avg = x_min_sum / valid_boxes
                 x_max_avg = x_max_sum / valid_boxes
