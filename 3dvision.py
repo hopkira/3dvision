@@ -84,7 +84,6 @@ now_frame = 0
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start = 0, end = 800, periods = 8)
 
-prop_gain = 2.0
 
 while True: # main loop until 'q' is pressed
 
@@ -139,11 +138,9 @@ while True: # main loop until 'q' is pressed
             if valid_boxes > 0:
                 z_avg = z_sum / valid_boxes
                 x_avg = x_sum / valid_boxes
-                angle = (( math.pi / 2 ) - math.atan2(z_avg, x_avg)) * prop_gain
-                if (angle > 0.04) :
-                    logo.right(abs(angle))
-                if (angle < -0.04) :
-                    logo.left(abs(angle))
+                angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
+                if abs(angle) > 0.04 :
+                    logo.left(angle)
                 y_avg = y_sum / valid_boxes
                 x_min_avg = x_min_sum / valid_boxes
                 x_max_avg = x_max_sum / valid_boxes
@@ -173,6 +170,9 @@ while True: # main loop until 'q' is pressed
                 fps = str(int(fps))
                 pt_t5 = x_1 + 5, y_1 + 140
                 cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
+            else:
+                logo.left(angle)
+                angle = 0
             cv2.imshow('depth', image_frame)
             # Process depth map to communicate to robot
             frame = skim.block_reduce(frame,(decimate,decimate),np.min)
