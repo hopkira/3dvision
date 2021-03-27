@@ -147,7 +147,7 @@ while True: # main loop until 'q' is pressed
                 angle = ( math.pi / 2 ) - math.atan2(z_avg, x_avg)
                 z = z_avg - MIN_DIST
                 magnitude = (x_avg * x_avg) + (z * z)
-                distance = Math.sqrt(magnitude)
+                distance = math.sqrt(magnitude)
                 #if abs(angle) > 0.04 :
                 #    logo.right(angle)
                 if distance > 0.04:
