@@ -59,7 +59,7 @@ angle = 0.0
 last_seen = 0.05
 MIN_DIST = 0.5
 MAX_DIST = 3.0
-CONF = 0.9
+CONF = 0.8
 SAFETY_MARGIN = 0.3
 
 disparity_confidence_threshold = 130
@@ -131,10 +131,14 @@ while True: # main loop until 'q' is pressed
                         (detection.depth_z < MAX_DIST) and 
                         (detection.confidence > CONF) and
                         (detection.confidence > confidence_max)):
+                        x_min = detection.x_min
+                        x_max = detection.x_max
+                        y_min = detection.y_min
+                        y_max = detection.y_max
                         z = float(detection.depth_z)
-                        x = float(detection.x_min + detection.x_max) / 2
-                        y = float(detection.y_min + detection.y_max) / 2
-                        confidence = detection.confidence
+                        x = float(x_min + x_max) / 2.0
+                        y = float(y_min + y_max) / 2.0
+                        confidence = float(detection.confidence)
                         valid_boxes += 1
                         #print('Found a valid person in range')
                         #x_min_sum = x_min_sum + detection.x_min
@@ -166,8 +170,8 @@ while True: # main loop until 'q' is pressed
                 # y_max_avg = y_max_sum / valid_boxes
                 # confidence_avg = confidence_sum / valid_boxes
                 # convert the resulting box into a bounding box
-                pt1 = nn_to_depth_coord(detection.x_min, detection.y_min, nn2depth)
-                pt2 = nn_to_depth_coord(detection.x_max, detection.y_min, nn2depth)
+                pt1 = nn_to_depth_coord(x_min, y_min, nn2depth)
+                pt2 = nn_to_depth_coord(x_max, y_max, nn2depth)
                 color = (255, 255, 255) # bgr white
                 label = "In Range Person"               
                 score = int(confidence * 100)  
