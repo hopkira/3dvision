@@ -59,7 +59,7 @@ angle = 0.0
 last_seen = 0.05
 MIN_DIST = 0.5
 MAX_DIST = 3.0
-CONF = 0.6
+CONF = 0.9
 SAFETY_MARGIN = 0.3
 
 disparity_confidence_threshold = 130
@@ -113,15 +113,15 @@ while True: # main loop until 'q' is pressed
             image_frame = (65535 // image_frame).astype(np.uint8)
             # colorize depth map
             image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
-            x_min_sum = 0
-            x_max_sum = 0
-            y_min_sum = 0
-            y_max_sum = 0
-            z_min = MAX_DIST
-            x_sum = 0
-            y_sum = 0
-            confidence_sum = 0
-            valid_boxes = 0
+            #x_min_sum = 0
+            #x_max_sum = 0
+            #y_min_sum = 0
+            #y_max_sum = 0
+            #z_min = MAX_DIST
+            #x_sum = 0
+            #y_sum = 0
+            confidence_max = 0
+            # valid_boxes = 0
             if detections is not None:
                 #print("There are", str(len(detections)),"objects found by cameras")
                 for detection in detections:
@@ -129,24 +129,28 @@ while True: # main loop until 'q' is pressed
                     if ((detection.label == 15) and 
                         (detection.depth_z > MIN_DIST) and 
                         (detection.depth_z < MAX_DIST) and 
-                        (detection.confidence > CONF)):
-                        valid_boxes += 1
+                        (detection.confidence > CONF)) and
+                        (detection.confidence > confidence_max):
+                        z = float(detection.depth_z)
+                        x = float(detection.x_min + detection.x_max) / 2
+                        y = float(detection.y_min + detection.y_max) / 2
+                        #valid_boxes += 1
                         #print('Found a valid person in range')
-                        x_min_sum = x_min_sum + detection.x_min
-                        x_max_sum = x_max_sum + detection.x_max
-                        y_min_sum = y_min_sum + detection.y_min
-                        y_max_sum = y_max_sum + detection.y_max
-                        z_min = min(z_min, float(detection.depth_z))
-                        x_sum = x_sum + detection.depth_x
-                        y_sum = y_sum + detection.depth_y
-                        confidence_sum = confidence_sum + detection.confidence     
+                        #x_min_sum = x_min_sum + detection.x_min
+                        #x_max_sum = x_max_sum + detection.x_max
+                        #y_min_sum = y_min_sum + detection.y_min
+                        #y_max_sum = y_max_sum + detection.y_max
+                        #z_min = min(z_min, float(detection.depth_z))
+                        #x_sum = x_sum + detection.depth_x
+                        #y_sum = y_sum + detection.depth_y
+                        #confidence_sum = confidence_sum + detection.confidence     
             #print("There are", str(valid_boxes), "valid detections")
             if valid_boxes > 0:
                 last_seen = time.time()
-                x_avg = x_sum / valid_boxes # x axis displacement
-                angle = ( math.pi / 2 ) - math.atan2(z_min, x_avg)
-                z = float(z_min)
-                x = float(x_avg)
+                # x_avg = x_sum / valid_boxes # x axis displacement
+                angle = ( math.pi / 2 ) - math.atan2(z, x)
+                # z = float(z_min)
+                # x = float(x_avg)
                 magnitude = (x * x) + (z * z)
                 distance = math.sqrt(magnitude)
                 if abs(angle) > 0.2 :
@@ -154,15 +158,15 @@ while True: # main loop until 'q' is pressed
                 elif z > (SAFETY_MARGIN + MIN_DIST) :
                     print("Moving forward by",z,"m")
                     logo.forwards(z - (SAFETY_MARGIN + MIN_DIST))
-                y_avg = y_sum / valid_boxes
-                x_min_avg = x_min_sum / valid_boxes
-                x_max_avg = x_max_sum / valid_boxes
-                y_min_avg = y_min_sum / valid_boxes
-                y_max_avg = y_max_sum / valid_boxes
-                confidence_avg = confidence_sum / valid_boxes
+                # y_avg = y_sum / valid_boxes
+                # x_min_avg = x_min_sum / valid_boxes
+                # x_max_avg = x_max_sum / valid_boxes
+                # y_min_avg = y_min_sum / valid_boxes
+                # y_max_avg = y_max_sum / valid_boxes
+                # confidence_avg = confidence_sum / valid_boxes
                 # convert the resulting box into a bounding box
-                pt1 = nn_to_depth_coord(x_min_avg, y_min_avg, nn2depth)
-                pt2 = nn_to_depth_coord(x_max_avg, y_max_avg, nn2depth)
+                pt1 = nn_to_depth_coord(detection.x_min, detection.y_min, nn2depth)
+                pt2 = nn_to_depth_coord(dectection.x_max, detection.y_min, nn2depth)
                 color = (255, 255, 255) # bgr white
                 label = "In Range Person"               
                 score = int(confidence_sum * 100)  
@@ -170,11 +174,11 @@ while True: # main loop until 'q' is pressed
                 cv2.putText(image_frame, str(score) + '% ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_DUPLEX, 0.5, color, 2)  
                 x_1, y_1 = pt1
                 pt_t1 = x_1 + 5, y_1 + 60
-                cv2.putText(image_frame, 'x:' '{:7.2f}'.format(x_avg) + ' m', pt_t1, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
+                cv2.putText(image_frame, 'x:' '{:7.2f}'.format(x) + ' m', pt_t1, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t2 = x_1 + 5, y_1 + 80
-                cv2.putText(image_frame, 'y:' '{:7.2f}'.format(y_avg) + ' m', pt_t2, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
+                cv2.putText(image_frame, 'y:' '{:7.2f}'.format(y) + ' m', pt_t2, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t3 = x_1 + 5, y_1 + 100
-                cv2.putText(image_frame, 'z:' '{:7.2f}'.format(z_min) + ' m', pt_t3, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
+                cv2.putText(image_frame, 'z:' '{:7.2f}'.format(z) + ' m', pt_t3, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 pt_t4 = x_1 + 5, y_1 + 120
                 cv2.putText(image_frame, 'angle: ' '{:2.4f}'.format(angle) + ' radians', pt_t4, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
                 now_frame = time.time()
