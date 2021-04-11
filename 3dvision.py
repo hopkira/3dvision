@@ -129,8 +129,8 @@ while True: # main loop until 'q' is pressed
                     if ((detection.label == 15) and 
                         (detection.depth_z > MIN_DIST) and 
                         (detection.depth_z < MAX_DIST) and 
-                        (detection.confidence > CONF)) and
-                        (detection.confidence > confidence_max):
+                        (detection.confidence > CONF) and
+                        (detection.confidence > confidence_max)):
                         z = float(detection.depth_z)
                         x = float(detection.x_min + detection.x_max) / 2
                         y = float(detection.y_min + detection.y_max) / 2
