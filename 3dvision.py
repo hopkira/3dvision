@@ -59,7 +59,7 @@ angle = 0.0
 last_seen = 0.05
 MIN_DIST = 0.5
 MAX_DIST = 3.0
-CONF = 0.8
+CONF = 0.7
 SAFETY_MARGIN = 0.3
 
 disparity_confidence_threshold = 130
@@ -150,8 +150,8 @@ while True: # main loop until 'q' is pressed
                 # x = float(x_avg)
                 magnitude = (x * x) + (z * z)
                 distance = math.sqrt(magnitude)
-                # if abs(angle) > 0.2 :
-                #    logo.right(angle)
+                if abs(angle) > 0.2 :
+                    logo.right(angle)
                 # elif z > (SAFETY_MARGIN + MIN_DIST) :
                 #    print("Moving forward by",z,"m")
                 #    logo.forwards(z - (SAFETY_MARGIN + MIN_DIST))
