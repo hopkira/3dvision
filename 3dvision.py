@@ -140,16 +140,6 @@ while True: # main loop until 'q' is pressed
                         y = float(y_min + y_max) / 2.0
                         confidence = float(detection.confidence)
                         valid_boxes += 1
-                        #print('Found a valid person in range')
-                        #x_min_sum = x_min_sum + detection.x_min
-                        #x_max_sum = x_max_sum + detection.x_max
-                        #y_min_sum = y_min_sum + detection.y_min
-                        #y_max_sum = y_max_sum + detection.y_max
-                        #z_min = min(z_min, float(detection.depth_z))
-                        #x_sum = x_sum + detection.depth_x
-                        #y_sum = y_sum + detection.depth_y
-                        #confidence_sum = confidence_sum + detection.confidence     
-            #print("There are", str(valid_boxes), "valid detections")
             if valid_boxes > 0:
                 print("Target at", x, z)
                 last_seen = time.time()
@@ -160,18 +150,11 @@ while True: # main loop until 'q' is pressed
                 # x = float(x_avg)
                 magnitude = (x * x) + (z * z)
                 distance = math.sqrt(magnitude)
-                if abs(angle) > 0.2 :
-                    logo.right(angle)
+                # if abs(angle) > 0.2 :
+                #    logo.right(angle)
                 # elif z > (SAFETY_MARGIN + MIN_DIST) :
                 #    print("Moving forward by",z,"m")
                 #    logo.forwards(z - (SAFETY_MARGIN + MIN_DIST))
-                # y_avg = y_sum / valid_boxes
-                # x_min_avg = x_min_sum / valid_boxes
-                # x_max_avg = x_max_sum / valid_boxes
-                # y_min_avg = y_min_sum / valid_boxes
-                # y_max_avg = y_max_sum / valid_boxes
-                # confidence_avg = confidence_sum / valid_boxes
-                # convert the resulting box into a bounding box
                 pt1 = nn_to_depth_coord(x_min, y_min, nn2depth)
                 pt2 = nn_to_depth_coord(x_max, y_max, nn2depth)
                 color = (255, 255, 255) # bgr white
