@@ -134,6 +134,7 @@ while True: # main loop until 'q' is pressed
                         z = float(detection.depth_z)
                         x = float(detection.x_min + detection.x_max) / 2
                         y = float(detection.y_min + detection.y_max) / 2
+                        confidence = detection.confidence
                         valid_boxes += 1
                         #print('Found a valid person in range')
                         #x_min_sum = x_min_sum + detection.x_min
@@ -166,10 +167,10 @@ while True: # main loop until 'q' is pressed
                 # confidence_avg = confidence_sum / valid_boxes
                 # convert the resulting box into a bounding box
                 pt1 = nn_to_depth_coord(detection.x_min, detection.y_min, nn2depth)
-                pt2 = nn_to_depth_coord(dectection.x_max, detection.y_min, nn2depth)
+                pt2 = nn_to_depth_coord(detection.x_max, detection.y_min, nn2depth)
                 color = (255, 255, 255) # bgr white
                 label = "In Range Person"               
-                score = int(confidence_sum * 100)  
+                score = int(confidence * 100)  
                 cv2.rectangle(image_frame, pt1, pt2, color)
                 cv2.putText(image_frame, str(score) + '% ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_DUPLEX, 0.5, color, 2)  
                 x_1, y_1 = pt1
