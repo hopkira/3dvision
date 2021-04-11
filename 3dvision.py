@@ -121,7 +121,7 @@ while True: # main loop until 'q' is pressed
             #x_sum = 0
             #y_sum = 0
             confidence_max = 0
-            # valid_boxes = 0
+            valid_boxes = 0
             if detections is not None:
                 #print("There are", str(len(detections)),"objects found by cameras")
                 for detection in detections:
@@ -134,7 +134,7 @@ while True: # main loop until 'q' is pressed
                         z = float(detection.depth_z)
                         x = float(detection.x_min + detection.x_max) / 2
                         y = float(detection.y_min + detection.y_max) / 2
-                        #valid_boxes += 1
+                        valid_boxes += 1
                         #print('Found a valid person in range')
                         #x_min_sum = x_min_sum + detection.x_min
                         #x_max_sum = x_max_sum + detection.x_max
