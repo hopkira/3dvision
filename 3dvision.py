@@ -136,8 +136,8 @@ while True: # main loop until 'q' is pressed
                         y_min = detection.y_min
                         y_max = detection.y_max
                         z = float(detection.depth_z)
-                        x = float(x_min + x_max) / 2.0
-                        y = float(y_min + y_max) / 2.0
+                        x = float(detection.depth_x)
+                        y = float(detection.depth_y)
                         confidence = float(detection.confidence)
                         valid_boxes += 1
             if valid_boxes > 0:
