@@ -148,13 +148,14 @@ while True: # main loop until 'q' is pressed
                 print("Angle to move",angle,"radians")
                 # z = float(z_min)
                 # x = float(x_avg)
-                magnitude = (x * x) + (z * z)
-                distance = math.sqrt(magnitude)
+                #magnitude = (x * x) + (z * z)
+                #distance = math.sqrt(magnitude)
                 if abs(angle) > 0.2 :
                     logo.right(angle)
-                elif distance > (SAFETY_MARGIN + MIN_DIST) :
-                    print("Moving forward by",z,"m")
-                    logo.forwards(distance - (SAFETY_MARGIN + MIN_DIST))
+                elif z > (SAFETY_MARGIN + MIN_DIST) :
+                    distance = float(z - (SAFETY_MARGIN + MIN_DIST))
+                    print("Target is",z,"m away. Moving forward by",distance,"m")
+                    logo.forwards(distance)
                 pt1 = nn_to_depth_coord(x_min, y_min, nn2depth)
                 pt2 = nn_to_depth_coord(x_max, y_max, nn2depth)
                 color = (255, 255, 255) # bgr white
