@@ -160,9 +160,9 @@ while True: # main loop until 'q' is pressed
                 distance = math.sqrt(magnitude)
                 if abs(angle) > 0.2 :
                     logo.right(angle)
-                elif z > (SAFETY_MARGIN + MIN_DIST) :
-                    print("Moving forward by",z,"m")
-                    logo.forwards(z - (SAFETY_MARGIN + MIN_DIST))
+                # elif z > (SAFETY_MARGIN + MIN_DIST) :
+                #    print("Moving forward by",z,"m")
+                #    logo.forwards(z - (SAFETY_MARGIN + MIN_DIST))
                 # y_avg = y_sum / valid_boxes
                 # x_min_avg = x_min_sum / valid_boxes
                 # x_max_avg = x_max_sum / valid_boxes
