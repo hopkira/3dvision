@@ -151,9 +151,11 @@ while True: # main loop until 'q' is pressed
                         #confidence_sum = confidence_sum + detection.confidence     
             #print("There are", str(valid_boxes), "valid detections")
             if valid_boxes > 0:
+                print("Target at", x, z)
                 last_seen = time.time()
                 # x_avg = x_sum / valid_boxes # x axis displacement
                 angle = ( math.pi / 2 ) - math.atan2(z, x)
+                print("Angle to move",angle,"radians")
                 # z = float(z_min)
                 # x = float(x_avg)
                 magnitude = (x * x) + (z * z)
