@@ -1,7 +1,9 @@
 # 3dvision
 
 ## 3dvision.py
-Simple program that uses the mobile-net SSD model to detect a person's legs and follow them around the room. Simultaneously, it creates a point cloud that it simplifies into a one dimensional array that tells the robot how close obstacles are that are in front of it.
+Simple program that uses the OAK-D stereoscopic camera and the mobile-net SSD model to detect a person's legs and follow them around the room. Simultaneously, it creates a point cloud that it simplifies into a one dimensional array that tells the robot how close obstacles are that are in front of it.  This is work on progress - do not use near small children or animals or in any place where a robot might do damage!
+
+Currently runs at about 10 FPS on a Raspberry Pi 4.
 
 Code will be fully described once complete, but partial descriptions are here:
 * Cleaning up the raw depth map (https://k9-build.blogspot.com/2021/01/oak-d-point-cloud-on-pi-part-1.html)
