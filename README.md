@@ -18,4 +18,4 @@ A simple program that emulates an old fashioned logo turtle and drives the robot
 * Modifying robot logo routine to cope with on the fly changes (https://k9-build.blogspot.com/2021/04/calculating-optimal-speed-for-moving.html)
 
 ## requirement.txt
-A list of the Python libraries you will need to get the 3d vision program to run. I'd advice creating a Python virtual environment and "running python3 -m pip install -r requirements.txt"
+A list of the Python libraries you will need to get the 3d vision program to run. I'd advise creating a Python virtual environment and "running python3 -m pip install -r requirements.txt"
