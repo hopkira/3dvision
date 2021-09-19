@@ -1,16 +1,78 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+#!/usr/bin/env python3
+"""K9 Asssistant Following State Machine
+
+Args:
+    -a, --max (float): Maximum distance to follow
+    -i, --min (float): Minimum distance to follow
+    -s, --safe (float): Addiitional safety margin
+    -c, --conf (float): Confidence level
+
+Example:
+    $ python3 3dvision.py -a 2.0 -i 0.2 -s 0.1 -c 0.75
+
+Todo:
+    * stuff
+
+K9 word marks and logos are trade marks of the British Broadcasting Corporation and
+are copyright BBC 1977 onwards
+"""
+
 import sys
+import os
 import time
-import cv2
 import json
 import math
+import argparse
 import depthai
 import numpy as np
 import pandas as pd
 import skimage.measure as skim
-import logo
+import paho.mqtt.client as mqtt
+import logo # K9 movement library
+from operator import attrgetter
+
+# construct the argument parser and parse the arguments
+ap = argparse.ArgumentParser()
+ap.add_argument("-a", "--max", type=float, default=2.0,
+	help="Maximum distance")
+ap.add_argument("-i", "--min", type=float, default=0.5,
+	help="Maximum distance")
+ap.add_argument("-s", "--safe", type=float, default=0.5,
+	help="Maximum distance")
+ap.add_argument("-c", "--conf", type=float, default=0.85,
+	help="Maximum distance")
+args = vars(ap.parse_args())
+
+print(args)
+
+MIN_DIST = args['max']
+MAX_DIST = args['min']
+CONF = args['conf']
+SAFETY_MARGIN = args['safe']
+
+# These values control K9s voice
+SPEED_DEFAULT = 150
+SPEED_DOWN = 125
+AMP_UP = 200
+AMP_DEFAULT = 190
+AMP_DOWN = 180
+PITCH_DEFAULT = 99
+PITCH_DOWN = 89
+SOX_VOL_UP = 25
+SOX_VOL_DEFAULT = 20
+SOX_VOL_DOWN = 15
+SOX_PITCH_UP = 100
+SOX_PITCH_DEFAULT = 0
+SOX_PITCH_DOWN = -100
+
+detections = []
+angle = 0.0
+last_seen = 0.05
+
+disparity_confidence_threshold = 130
 
 sys.path.append('/home/pi/k9-chess-angular/python') 
 
@@ -54,27 +116,6 @@ def nn_to_depth_coord(x, y, nn2depth):
     y_depth = int(nn2depth['off_y'] + y * nn2depth['max_h'])
     return x_depth, y_depth
 
-detections = []
-angle = 0.0
-last_seen = 0.05
-MIN_DIST = 0.5
-MAX_DIST = 3.0
-CONF = 0.85
-SAFETY_MARGIN = 0.5
-
-disparity_confidence_threshold = 130
-
-def on_trackbar_change(value):
-    device.send_disparity_confidence_threshold(value)
-    return
-
-cv2.namedWindow('depth')
-trackbar_name = 'Disparity confidence'
-conf_thr_slider_min = 0
-conf_thr_slider_max = 255
-cv2.createTrackbar(trackbar_name, 'depth', conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
-cv2.setTrackbarPos(trackbar_name, 'depth', disparity_confidence_threshold)
-
 decimate = 20
 max_dist = 4000.0
 height = 400.0
@@ -87,145 +128,351 @@ fy = 2.05
 prev_frame = 0
 now_frame = 0
 
+# These bins represent the space in front of the 3d camera
+# Each cell is a 10cm square, two metres either side of the dog
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start = 0, end = 800, periods = 8)
 
 
-while True: # main loop until 'q' is pressed
+class State(object):
+    '''
+    State parent class to support standard Python functions
+    '''
 
-    nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
+    def __init__(self):
+        print('Entering state:', str(self))
 
-    for nnet_packet in nnet_packets:
-        detections = list(nnet_packet.getDetectedObjects())
-        for detection in detections:
-            if detection.label == 5: # we're looking for a bottle...
-                pass
-                #print('Bottle is ' + '{:.2f}'.format(detection.depth_z) + 'm away.')
-                #angle = (math.pi / 2) - math.atan2(detection.depth_z, detection.depth_x)
-                #print('Bottle is at ' + '{:.2f}'.format(angle) + ' radians.')
+    def on_event(self, event):
+        '''
+        Incoming events processing is delegated to the child State
+        to define and enable the valid state transitions.
+        '''
+        pass
 
-    for packet in data_packets:
-        if packet.stream_name == 'depth':
-            frame = packet.getData()
-            # create a specific frame for display
-            image_frame = np.copy(frame)
-            cv2.putText(image_frame, packet.stream_name, (25, 25), cv2.FONT_HERSHEY_DUPLEX, 1.0, (255, 255, 255))
-            image_frame = (65535 // image_frame).astype(np.uint8)
-            # colorize depth map
-            image_frame = cv2.applyColorMap(image_frame, cv2.COLORMAP_HOT)
-            #x_min_sum = 0
-            #x_max_sum = 0
-            #y_min_sum = 0
-            #y_max_sum = 0
-            #z_min = MAX_DIST
-            #x_sum = 0
-            #y_sum = 0
+    def run(self):
+        '''
+        Enable the state to do something - this is usually delegated
+        to the child States)
+        '''
+        print('Run event for ' + str(self) + ' state not implemented')
+
+    def __repr__(self):
+        '''
+        Leverages the __str__ method to describe the State.
+        '''
+        return self.__str__()
+
+    def __str__(self):
+        '''
+        Returns the name of the State.
+        '''
+        return self.__class__.__name__
+
+
+class K9(object):
+    '''
+    A K9 finite state machine that starts in waiting state and
+    will transition to a new state on when a transition event occurs.
+    It also supports a run command to enable each state to have its
+    own specific behaviours
+    '''
+
+    def __init__(self):
+        ''' Initialise K9 in his waiting state. '''
+
+        # Start with initializing actions
+        self.state = Initializing()
+
+    def run(self):
+        ''' Run the behaviour of the current K9 state using its run function'''
+
+        self.state.run()
+
+    def on_event(self, event):
+        '''
+        Process the incoming event using the on_event function of the
+        current K9 state.  This may result in a change of state.
+        '''
+
+        # The next state will be the result of the on_event function.
+        print("State: " + str(self.state) + " Event: " + event)
+        self.state = self.state.on_event(event)
+
+    def speak(self,speech):
+        '''
+        Break speech up into clauses and speak each one with
+        various pitches, volumes and distortions
+        to make the voice more John Leeson like
+        '''
+        
+        print(speech)
+        clauses = speech.split("|")
+        for clause in clauses:
+            if clause and not clause.isspace():
+                if clause[:1] == ">":
+                    clause = clause[1:]
+                    pitch = PITCH_DEFAULT
+                    speed = SPEED_DOWN
+                    amplitude = AMP_UP
+                    sox_vol = SOX_VOL_UP
+                    sox_pitch = SOX_PITCH_UP
+                elif clause[:1] == "<":
+                    clause = clause[1:]
+                    pitch = PITCH_DOWN
+                    speed = SPEED_DOWN
+                    amplitude = AMP_DOWN
+                    sox_vol = SOX_VOL_DOWN
+                    sox_pitch = SOX_PITCH_DOWN
+                else:
+                    pitch = PITCH_DEFAULT
+                    speed = SPEED_DEFAULT
+                    amplitude = AMP_DEFAULT
+                    sox_vol = SOX_VOL_DEFAULT
+                    sox_pitch = SOX_PITCH_DEFAULT
+                cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z --stdout|play -v %s - synth sine fmod 25 pitch %s" % (clause, pitch, speed, amplitude, sox_vol, sox_pitch)
+                os.system(cmd)
+
+    def scan(self):
+        '''
+        Retrieve a 40 element array derived from the 3D camera
+        '''
+        nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
+        packet = [packet for packet in data_packets if packet.stream_name == 'depth']
+        frame = packet.getData()
+        # create a specific frame for display
+        image_frame = np.copy(frame)
+        # Process depth map to communicate to robot
+        frame = skim.block_reduce(frame,(decimate,decimate),np.min)
+        height, width = frame.shape
+        # Convert depth map to point cloud with valid depths
+        column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
+        valid = (frame > 200) & (frame < max_dist)
+        z = np.where(valid, frame, 0)
+        x = np.where(valid, (z * (column - cx) /cx / fx) + 120 , max_dist)
+        y = np.where(valid, 325 - (z * (row - cy) / cy / fy) , max_dist)
+        # Flatten point cloud axes
+        z2 = z.flatten()
+        x2 = x.flatten()
+        y2 = y.flatten()
+        # Stack the x, y and z co-ordinates into a single 2D array
+        cloud = np.column_stack((x2,y2,z2))
+        # Filter the array by x and y co-ordinates
+        in_scope = (cloud[:,1]<800) & (cloud[:,1] > 0) & (cloud[:,0]<2000) & (cloud[:,0] > -2000)
+        in_scope = np.repeat(in_scope, 3)
+        in_scope = in_scope.reshape(-1, 3)
+        scope = np.where(in_scope, cloud, np.nan)
+        # Remove invalid rows from array
+        scope = scope[~np.isnan(scope).any(axis=1)]
+        # Index each point into 10cm x and y bins (40 x 8)
+        x_index = pd.cut(scope[:,0], x_bins)
+        y_index = pd.cut(scope[:,1], y_bins)
+        # Place the depth values into the corresponding bin
+        binned_depths = pd.Series(scope[:,2])
+        # Average the depth measures in each bin
+        totals = binned_depths.groupby([y_index, x_index]).mean()
+        # Reshape the bins into a 8 x 40 matrix
+        totals = totals.values.reshape(8,40)
+        # Determine the nearest segment for each of the 40
+        # horizontal segments
+        closest = np.amin(totals, axis = 0 )
+        # Round the to the nearest 10cm
+        closest = np.around(closest,-2)
+        # Turn into a 1D array
+        closest = closest.reshape(1,-1)
+        # print(closest)
+        return closest
+
+# Create the k9 finite state machine
+k9 = K9()
+
+# Declare the basic K9 operational states
+class Initializing(State):
+
+    '''
+    The child state where K9 is waiting and appears dormant
+    '''
+    def __init__(self):
+        k9.speak("All systems initializing")
+        time.sleep(2.0)
+        # Connect to the local Espruino controller
+        k9.last_message = ""
+        k9.client = mqtt.Client("k9-python")
+        k9.client.connect("localhost")
+        k9.on_event('initialized')
+
+    def run(self):
+        # Waits for a command from Espruino Watch
+        pass
+
+    def on_event(self, event):
+        # Various events that can come from the watch...
+        print("Event: " + event)
+        if event == "TURN_ON_WATCHSTRING":
+            return Awake
+        return self
+
+
+class Asleep(State):
+
+    '''
+    The child state where K9 is appears dormant
+    '''
+    def __init__(self):
+        # turn all lights off
+        logo.stop()
+        k9.speak("Conserving battery power")
+
+    def run(self):
+        pass
+
+    def on_event(self, event):
+        if event == 'WAKE_UP_WATCHSTRING':
+            return Awake
+        return self
+
+
+class Awake(State):
+
+    '''
+    The child state where K9 is waiting and appears dormant
+    '''
+    def __init__(self):
+        # turn on lights
+        k9.speak("Command received")
+
+    def run(self):
+        pass
+
+    def on_event(self, event):
+        if event == 'FOLLOW_WATCHSTRING':
+            return Scanning
+        if event == 'SLEEP_WATCHSTRING':
+            return Asleep
+        return self
+
+
+class Scanning(State):
+
+    '''
+    The child state where K9 is looking for the nearest person to follow
+    '''
+    def __init__(self):
+        print('Entering state:', str(self))
+        print('Waiting for the closest person to be detected...')
+        k9.target = None
+        logo.stop()
+
+    def run(self):
+        # Checks for the nearest person in the field of vision
+        nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
+        for nnet_packet in nnet_packets:
             confidence_max = 0
-            valid_boxes = 0
+            detections = list(nnet_packet.getDetectedObjects())
             if detections is not None:
-                #print("There are", str(len(detections)),"objects found by cameras")
-                for detection in detections:
-                    #print("Found",str(labels[detection.label]), "at", str(detection.depth_z), "m with confidence",str(detection.confidence))
-                    if ((detection.label == 15) and 
-                        (detection.depth_z > MIN_DIST) and 
-                        (detection.depth_z < MAX_DIST) and 
-                        (detection.confidence > CONF) and
-                        (detection.confidence > confidence_max)):
-                        x_min = detection.x_min
-                        x_max = detection.x_max
-                        y_min = detection.y_min
-                        y_max = detection.y_max
-                        z = float(detection.depth_z)
-                        x = float(detection.depth_x)
-                        y = float(detection.depth_y)
-                        confidence = float(detection.confidence)
-                        valid_boxes += 1
-            if valid_boxes > 0:
-                print("Target at", x, z)
-                last_seen = time.time()
-                # x_avg = x_sum / valid_boxes # x axis displacement
-                angle = ( math.pi / 2 ) - math.atan2(z, x)
-                print("Angle to move",angle,"radians")
-                # z = float(z_min)
-                # x = float(x_avg)
-                #magnitude = (x * x) + (z * z)
-                #distance = math.sqrt(magnitude)
-                if abs(angle) > 0.2 :
-                    logo.right(angle)
-                elif z > (SAFETY_MARGIN + MIN_DIST) :
-                    distance = float(z - (SAFETY_MARGIN + MIN_DIST))
-                    print("Target is",z,"m away. Moving forward by",distance,"m")
-                    logo.forwards(distance)
-                pt1 = nn_to_depth_coord(x_min, y_min, nn2depth)
-                pt2 = nn_to_depth_coord(x_max, y_max, nn2depth)
-                color = (255, 255, 255) # bgr white
-                label = "In Range Person"               
-                score = int(confidence * 100)  
-                cv2.rectangle(image_frame, pt1, pt2, color)
-                cv2.putText(image_frame, str(score) + '% ' + label,(pt1[0] + 2, pt1[1] + 15),cv2.FONT_HERSHEY_DUPLEX, 0.5, color, 2)  
-                x_1, y_1 = pt1
-                pt_t1 = x_1 + 5, y_1 + 60
-                cv2.putText(image_frame, 'x:' '{:7.2f}'.format(x) + ' m', pt_t1, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
-                pt_t2 = x_1 + 5, y_1 + 80
-                cv2.putText(image_frame, 'y:' '{:7.2f}'.format(y) + ' m', pt_t2, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
-                pt_t3 = x_1 + 5, y_1 + 100
-                cv2.putText(image_frame, 'z:' '{:7.2f}'.format(z) + ' m', pt_t3, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
-                pt_t4 = x_1 + 5, y_1 + 120
-                cv2.putText(image_frame, 'angle: ' '{:2.4f}'.format(angle) + ' radians', pt_t4, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
-                now_frame = time.time()
-                fps = 1/(now_frame - prev_frame) 
-                prev_frame = now_frame
-                fps = str(int(fps))
-                pt_t5 = x_1 + 5, y_1 + 140
-                cv2.putText(image_frame, 'fps: ' + fps, pt_t5, cv2.FONT_HERSHEY_DUPLEX, 0.5, color)
-            #else:
-            #    searching = time.time() - last_seen
-            #    if searching > 1.0 and searching < 5.0:
-            #        if abs(angle) > 0.04:
-            #            logo.right(angle)
-            cv2.imshow('depth', image_frame)
-            # Process depth map to communicate to robot
-            frame = skim.block_reduce(frame,(decimate,decimate),np.min)
-            height, width = frame.shape
-            # Convert depth map to point cloud with valid depths
-            column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
-            valid = (frame > 200) & (frame < max_dist)
-            z = np.where(valid, frame, 0)
-            x = np.where(valid, (z * (column - cx) /cx / fx) + 120 , max_dist)
-            y = np.where(valid, 325 - (z * (row - cy) / cy / fy) , max_dist)
-            # Flatten point cloud axes
-            z2 = z.flatten()
-            x2 = x.flatten()
-            y2 = y.flatten()
-            # Stack the x, y and z co-ordinates into a single 2D array
-            cloud = np.column_stack((x2,y2,z2))
-            # Filter the array by x and y co-ordinates
-            in_scope = (cloud[:,1]<800) & (cloud[:,1] > 0) & (cloud[:,0]<2000) & (cloud[:,0] > -2000)
-            in_scope = np.repeat(in_scope, 3)
-            in_scope = in_scope.reshape(-1, 3)
-            scope = np.where(in_scope, cloud, np.nan)
-            # Remove invalid rows from array
-            scope = scope[~np.isnan(scope).any(axis=1)]
-            # Index each point into 10cm x and y bins (40 x 8)
-            x_index = pd.cut(scope[:,0], x_bins)
-            y_index = pd.cut(scope[:,1], y_bins)
-            # Place the depth values into the corresponding bin
-            binned_depths = pd.Series(scope[:,2])
-            # Average the depth measures in each bin
-            totals = binned_depths.groupby([y_index, x_index]).mean()
-            # Reshape the bins into a 8 x 40 matrix
-            totals = totals.values.reshape(8,40)
-            # Determine the nearest segment for each of the 40
-            # horizontal segments
-            closest = np.amin(totals, axis = 0 )
-            # Round the to the nearest 10cm
-            closest = np.around(closest,-2)
-            # Turn into a 1D array
-            closest = closest.reshape(1,-1)
-            # print(closest)
-    
-    if cv2.waitKey(1) == ord('q'):
-        break
+                people = [detection for detection in detections
+                            if detection.label == 15
+                            if detection.depth_z > MIN_DIST
+                            if detection.depth_z < MAX_DIST
+                            if detection.confidence > CONF]
+                if people is not None:
+                    k9.target = min(people, key=attrgetter('detection.depth_z'))
+                    k9.on_event('person_found')
 
-del body_cam
-del device
+    def on_event(self, event):
+        if event == 'person_found':
+            return Turning()
+        return self
+
+
+class Turning(State):
+
+    '''
+    The child state where K9 is turning towards the target person
+    '''
+    def __init__(self):
+        print('Entering state:', str(self))
+        z = float(k9.target.depth_z)
+        x = float(k9.target.depth_x)
+        angle = ( math.pi / 2 ) - math.atan2(z, x)
+        print("Moving ",angle," radians towards target")
+        if abs(angle) > 0.2 :
+            logo.right(angle)
+        else:
+            if z > (SAFETY_MARGIN + MIN_DIST) :
+                k9.on_event="move_forward"
+            else:
+                k9.on_event="target_reached"
+
+    def run(self):
+        # Checks to see if motors have stopped
+        if not logo.motors_moving:
+            k9.on_event="turn_finished"
+
+    def on_event(self, event):
+        if event == 'move_forward':
+            return Moving_Forward()
+        if event == 'turn_finished':
+            return Scanning
+        if event == 'target_reached':
+            return Scanning
+        return self
+
+
+class Moving_Forward(State):
+
+    '''
+    The child state where K9 is moving forwards to the target
+    '''
+    def __init__(self):
+        print('Entering state:', str(self))
+        z = float(k9.target.depth_z)
+        distance = float(z - (SAFETY_MARGIN + MIN_DIST))
+        print("Target is",z,"m away. Moving forward by",distance,"m")
+        logo.forwards(distance)
+
+    def run(self):
+        # Wait until move finishes and return to target scanning
+        # or detect that a collision is imminent and stop
+        if not logo.motors_moving:
+            k9.on_event="move_finished"
+        # if check between the values of x and y is less than
+        # SAFETY_MARGIN + MIN DIST, then stop
+        check = k9.scan()
+        min_dist = np.amin(check[17:25])
+        if min_dist < (SAFETY_MARGIN + MIN_DIST):
+            k9.on_event="move_finished"
+
+    def on_event(self, event):
+        if event == 'move_finished':
+            return Scanning()
+        return self
+
+
+#client.publish("test/message","did you get this?")
+def on_message(client, userdata, message):
+    """
+    Enables K9 to receive a message from an Epruino Watch via
+    MQTT over Bluetooth (BLE) to place it into active or inactive States
+    """
+    global last_message
+    payload = str(message.payload.decode("utf-8"))
+    if payload != k9.last_message:
+        k9.last_message = payload
+        event = payload[2:].lower()
+        print("Event: ",str(event))
+        k9.on_event(event)
+
+k9.client.on_message = on_message        # attach function to callback
+k9.client.subscribe("/ble/advertise/d3:fe:97:d2:d1:9e/espruino/m")
+
+k9.client.loop_start()
+
+try:
+    while True:
+        k9.run()
+except KeyboardInterrupt:
+    k9.client.loop_stop()
+    print("K9 halted by CTRL+C")
+    sys.exit(0)
+    del body_cam
+    del device
