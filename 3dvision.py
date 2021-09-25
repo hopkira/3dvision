@@ -17,7 +17,9 @@ Todo:
     * stuff
 
 K9 word marks and logos are trade marks of the British Broadcasting Corporation and
-are copyright BBC 1977 onwards
+are copyright BBC 1977-2021
+
+K9 was created by Bob Baker and David Martin
 """
 
 import sys
@@ -39,11 +41,11 @@ ap = argparse.ArgumentParser()
 ap.add_argument("-a", "--max", type=float, default=2.0,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default=0.5,
-	help="Maximum distance")
+	help="Minimium distance")
 ap.add_argument("-s", "--safe", type=float, default=0.5,
-	help="Maximum distance")
+	help="Safe distance")
 ap.add_argument("-c", "--conf", type=float, default=0.85,
-	help="Maximum distance")
+	help="Confidence")
 args = vars(ap.parse_args())
 
 print(args)
@@ -52,6 +54,9 @@ MIN_DIST = args['max']
 MAX_DIST = args['min']
 CONF = args['conf']
 SAFETY_MARGIN = args['safe']
+SWEET_SPOT = (MAX_DIST - (MIN_DIST+SAFETY_MARGIN))/2
+
+print("Sweet spot is",SWEET_SPOT,"from robot")
 
 # These values control K9s voice
 SPEED_DEFAULT = 150
@@ -360,13 +365,11 @@ class Scanning(State):
         print('Entering state:', str(self))
         print('Waiting for the closest person to be detected...')
         k9.target = None
-        logo.stop()
 
     def run(self):
         # Checks for the nearest person in the field of vision
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for nnet_packet in nnet_packets:
-            confidence_max = 0
             detections = list(nnet_packet.getDetectedObjects())
             if detections is not None:
                 people = [detection for detection in detections
@@ -377,6 +380,8 @@ class Scanning(State):
                 if people is not None:
                     k9.target = min(people, key=attrgetter('detection.depth_z'))
                     k9.on_event('person_found')
+        if k9.target is None and logo.motors_moving:
+            logo.stop()
 
     def on_event(self, event):
         if event == 'person_found':
@@ -398,7 +403,7 @@ class Turning(State):
         if abs(angle) > 0.2 :
             logo.right(angle)
         else:
-            if z > (SAFETY_MARGIN + MIN_DIST) :
+            if z > SWEET_SPOT :
                 k9.on_event="move_forward"
             else:
                 k9.on_event="target_reached"
@@ -426,9 +431,10 @@ class Moving_Forward(State):
     def __init__(self):
         print('Entering state:', str(self))
         z = float(k9.target.depth_z)
-        distance = float(z - (SAFETY_MARGIN + MIN_DIST))
-        print("Target is",z,"m away. Moving forward by",distance,"m")
-        logo.forwards(distance)
+        distance = float(z - SWEET_SPOT)
+        if distance > 0:
+            print("Target is",z,"m away. Moving forward by",distance,"m")
+            logo.forwards(distance)
 
     def run(self):
         # Wait until move finishes and return to target scanning
@@ -439,7 +445,7 @@ class Moving_Forward(State):
         # SAFETY_MARGIN + MIN DIST, then stop
         check = k9.scan()
         min_dist = np.amin(check[17:25])
-        if min_dist < (SAFETY_MARGIN + MIN_DIST):
+        if min_dist < SWEET_SPOT:
             k9.on_event="move_finished"
 
     def on_event(self, event):
