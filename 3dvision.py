@@ -190,7 +190,7 @@ class Initializing(State):
 
     def run(self):
         # Waits for a command from Espruino Watch
-        k9.client.loop(0.05)
+        k9.client.loop(0.1)
 
     def on_event(self, event):
         # Various events that can come from the watch...
@@ -213,7 +213,7 @@ class Asleep(State):
 
     def run(self):
         # Waits for a command from Espruino Watch
-        k9.client.loop(0.05)
+        k9.client.loop(0.1)
 
     def on_event(self, event):
         if event == 'K9Mwakon':
@@ -232,7 +232,7 @@ class Awake(State):
         k9.speak("K9 operational")
 
     def run(self):
-        k9.client.loop(0.05)
+        k9.client.loop(0.1)
 
     def on_event(self, event):
         if event == 'Chefolon':
@@ -480,14 +480,12 @@ def on_message(client, userdata, message):
 k9.client.on_message = on_message        # attach function to callback
 k9.client.subscribe("/ble/advertise/d3:fe:97:d2:d1:9e/espruino/m")
 
-k9.client.loop_start()
-
 try:
     while True:
         k9.run()
 except KeyboardInterrupt:
-    k9.client.loop_stop()
     print("K9 halted by CTRL+C")
-    sys.exit(0)
     del body_cam
     del device
+    k9.client.loop_stop()
+    sys.exit(0)
