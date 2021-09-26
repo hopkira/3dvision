@@ -86,7 +86,7 @@ device = depthai.Device('', False)
 config={
     "streams": ["depth","metaout"],
     "ai": {
-        "blob_file": "/home/pi/3dvision//mobilenet-ssd/mobilenet-ssd.blob",
+        "blob_file": "/home/pi/3dvision/mobilenet-ssd/mobilenet-ssd.blob",
         "blob_file_config": "/home/pi/3dvision/mobilenet-ssd/mobilenet-ssd.json",
         "calc_dist_to_bb": True,
         "camera_input": "right"
