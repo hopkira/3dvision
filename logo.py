@@ -93,7 +93,7 @@ def stop():
     global rc
     print("Stopping")
     if not sim:
-        rc.SpeedM1M2(address=rc_address, 0, 0)
+        rc.SpeedM1M2(address=rc_address, m1=0, m2=0)
         #rc.SpeedAccelDistanceM1M2(address=rc_address,
         #                          accel=int(ACCELERATION),
         #                          speed1=0,
