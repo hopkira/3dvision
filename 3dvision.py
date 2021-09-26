@@ -228,6 +228,7 @@ class Awake(State):
     def __init__(self):
         super(Awake, self).__init__()
         # turn on lights
+        logo.stop()
         k9.speak("K9 operational")
 
     def run(self):
@@ -250,10 +251,12 @@ class Scanning(State):
         super(Scanning, self).__init__()
         print('Entering state:', str(self))
         print('Waiting for the closest person to be detected...')
+        k9.speak("Finding person to follow")
         k9.target = None
 
     def run(self):
         # Checks for the nearest person in the field of vision
+        k9.client.loop(0.05)
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for nnet_packet in nnet_packets:
             detections = list(nnet_packet.getDetectedObjects())
@@ -272,6 +275,8 @@ class Scanning(State):
     def on_event(self, event):
         if event == 'person_found':
             return Turning()
+        if event == 'chefoloff':
+            return Awake()
         return self
 
 
@@ -296,11 +301,14 @@ class Turning(State):
                 k9.on_event="target_reached"
 
     def run(self):
+        k9.client.loop(0.05)
         # Checks to see if motors have stopped
         if not logo.motors_moving:
             k9.on_event="turn_finished"
 
     def on_event(self, event):
+        if event == 'chefoloff':
+            return Awake()
         if event == 'move_forward':
             return Moving_Forward()
         if event == 'turn_finished':
@@ -325,6 +333,7 @@ class Moving_Forward(State):
             logo.forwards(distance)
 
     def run(self):
+        k9.client.loop(0.05)
         # Wait until move finishes and return to target scanning
         # or detect that a collision is imminent and stop
         if not logo.motors_moving:
@@ -337,6 +346,8 @@ class Moving_Forward(State):
             k9.on_event="move_finished"
 
     def on_event(self, event):
+        if event == 'chefoloff':
+            return Awake()
         if event == 'move_finished':
             return Scanning()
         return self
