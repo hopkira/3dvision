@@ -186,7 +186,6 @@ class Initializing(State):
 
     def __init__(self):
         super(Initializing, self).__init__()
-        print('\a')
 
     def run(self):
         # Waits for a command from Espruino Watch
@@ -356,6 +355,11 @@ class K9(object):
 
         # Start with initializing actions
         self.state = Initializing()
+        self.last_message = ""
+        self.client = mqtt.Client("k9-python")
+        self.client.connect("localhost")
+        self.client.on_message = self.callback        # attach function to callback
+        self.client.subscribe("/ble/advertise/d3:fe:97:d2:d1:9e/espruino/m")
 
     def run(self):
         ''' Run the behaviour of the current K9 state using its run function'''
@@ -456,29 +460,20 @@ class K9(object):
         # print(closest)
         return closest
 
+    def callback(self, client, userdata, message):
+        """
+        Enables K9 to receive a message from an Epruino Watch via
+        MQTT over Bluetooth (BLE) to place it into active or inactive States
+        """
+        payload = str(message.payload.decode("utf-8"))
+        if payload != self.last_message:
+            self.last_message = payload
+            event = payload[2:].lower()
+            print("Event: ",str(event))
+            self.on_event(event)
+
 # Create the k9 finite state machine
 k9 = K9()
-
-k9.last_message = ""
-k9.client = mqtt.Client("k9-python")
-k9.client.connect("localhost")
-
-
-#client.publish("test/message","did you get this?")
-def on_message(client, userdata, message):
-    """
-    Enables K9 to receive a message from an Epruino Watch via
-    MQTT over Bluetooth (BLE) to place it into active or inactive States
-    """
-    payload = str(message.payload.decode("utf-8"))
-    if payload != k9.last_message:
-        k9.last_message = payload
-        event = payload[2:].lower()
-        print("Event: ",str(event))
-        k9.on_event(event)
-
-k9.client.on_message = on_message        # attach function to callback
-k9.client.subscribe("/ble/advertise/d3:fe:97:d2:d1:9e/espruino/m")
 
 try:
     while True:
