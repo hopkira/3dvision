@@ -359,7 +359,7 @@ class K9(object):
         self.client = mqtt.Client("k9-python")
         self.client.connect("localhost")
         self.client.on_message = self.callback        # attach function to callback
-        self.client.subscribe("/ble/advertise/d3:fe:97:d2:d1:9e/espruino/m")
+        self.client.subscribe("/ble/advertise/watch/m")
 
     def run(self):
         ''' Run the behaviour of the current K9 state using its run function'''
