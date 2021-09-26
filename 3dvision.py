@@ -294,11 +294,6 @@ class Turning(State):
         print("Moving ",angle," radians towards target")
         if abs(angle) > 0.2 :
             logo.right(angle)
-        else:
-            if z > SWEET_SPOT :
-                k9.on_event="move_forward"
-            else:
-                k9.on_event="target_reached"
 
     def run(self):
         k9.client.loop(0.1)
@@ -309,12 +304,8 @@ class Turning(State):
     def on_event(self, event):
         if event == 'chefoloff':
             return Awake()
-        if event == 'move_forward':
-            return Moving_Forward()
         if event == 'turn_finished':
-            return Scanning()
-        if event == 'target_reached':
-            return Scanning()
+            return Moving_Forward()
         return self
 
 
