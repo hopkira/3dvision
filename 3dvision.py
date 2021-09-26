@@ -24,7 +24,7 @@ K9 was created by Bob Baker and David Martin
 import argparse
 import sys
 import time
-import cv2
+import os
 import json
 import math
 import depthai
@@ -53,7 +53,7 @@ MIN_DIST = args['max']
 MAX_DIST = args['min']
 CONF = args['conf']
 SAFETY_MARGIN = args['safe']
-SWEET_SPOT = (MAX_DIST - (MIN_DIST+SAFETY_MARGIN))/2
+SWEET_SPOT = (MAX_DIST - MIN_DIST - SAFETY_MARGIN)/2
 
 print("Sweet spot is",SWEET_SPOT,"from robot")
 
