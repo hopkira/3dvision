@@ -185,9 +185,6 @@ class Initializing(State):
     def run(self):
         # Waits for a command from Espruino Watch
         k9.speak("All systems initializing")
-        k9.last_message = ""
-        k9.client = mqtt.Client("k9-python")
-        k9.client.connect("localhost")
         time.sleep(2.0)
         k9.on_event('initialized')
 
@@ -451,6 +448,11 @@ class K9(object):
 
 # Create the k9 finite state machine
 k9 = K9()
+
+k9.last_message = ""
+k9.client = mqtt.Client("k9-python")
+k9.client.connect("localhost")
+
 
 #client.publish("test/message","did you get this?")
 def on_message(client, userdata, message):
