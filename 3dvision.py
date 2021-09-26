@@ -468,7 +468,7 @@ class K9(object):
         payload = str(message.payload.decode("utf-8"))
         if payload != self.last_message:
             self.last_message = payload
-            event = payload[2:].lower()
+            event = payload[3:-1].lower()
             print("Event: ",str(event))
             self.on_event(event)
 
