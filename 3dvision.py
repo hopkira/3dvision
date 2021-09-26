@@ -403,7 +403,7 @@ class K9(object):
                     amplitude = AMP_DEFAULT
                     sox_vol = SOX_VOL_DEFAULT
                     sox_pitch = SOX_PITCH_DEFAULT
-                cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z --stdout|play -v %s - synth sine fmod 25 pitch %s" % (clause, pitch, speed, amplitude, sox_vol, sox_pitch)
+                cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z" % (clause, pitch, speed, amplitude)
                 os.system(cmd)
 
     def scan(self):
