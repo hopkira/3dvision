@@ -87,19 +87,20 @@ def calc_circle_arc(x_pos, y_pos):
     extent = math.asin(y_pos/radius)
     return radius, extent
 
-def stop(accel):
+def stop():
     '''Lock motors to stop motion
     '''
     global rc
     print("Stopping")
     if not sim:
-        rc.SpeedAccelDistanceM1M2(address=rc_address,
-                                  accel=int(ACCELERATION),
-                                  speed1=0,
-                                  distance1=0,
-                                  speed2=0,
-                                  distance2=0,
-                                  buffer=int(1))
+        rc.SpeedM1M2(address=rc_address, 0, 0)
+        #rc.SpeedAccelDistanceM1M2(address=rc_address,
+        #                          accel=int(ACCELERATION),
+        #                          speed1=0,
+        #                          distance1=0,
+        #                          speed2=0,
+        #                          distance2=0,
+        #                          buffer=int(1))
     print("Stop done")
 
 def get_speed():
