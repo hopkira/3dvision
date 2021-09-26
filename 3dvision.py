@@ -186,9 +186,7 @@ class Initializing(State):
 
     def __init__(self):
         super(Initializing, self).__init__()
-        k9.speak("Systems booting")
-        time.sleep(2.0)
-        k9.on_event('initialized')
+        print('\a')
 
     def run(self):
         # Waits for a command from Espruino Watch
