@@ -264,7 +264,7 @@ class Scanning(State):
                             if detection.depth_z < MAX_DIST
                             if detection.confidence > CONF]
                 if len(people) >= 1 :
-                    k9.target = min(people, key=attrgetter('detection.depth_z'))
+                    k9.target = min(people, key=attrgetter('depth_z'))
                     k9.on_event('person_found')
         if k9.target is None and logo.motors_moving:
             logo.stop()
