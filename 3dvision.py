@@ -128,19 +128,6 @@ MAX_DIST = 3.0
 CONF = 0.85
 SAFETY_MARGIN = 0.5
 
-disparity_confidence_threshold = 130
-
-def on_trackbar_change(value):
-    device.send_disparity_confidence_threshold(value)
-    return
-
-cv2.namedWindow('depth')
-trackbar_name = 'Disparity confidence'
-conf_thr_slider_min = 0
-conf_thr_slider_max = 255
-cv2.createTrackbar(trackbar_name, 'depth', conf_thr_slider_min, conf_thr_slider_max, on_trackbar_change)
-cv2.setTrackbarPos(trackbar_name, 'depth', disparity_confidence_threshold)
-
 decimate = 20
 max_dist = 4000.0
 height = 400.0
