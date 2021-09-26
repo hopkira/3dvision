@@ -180,10 +180,10 @@ class State(object):
 
 # Declare the basic K9 operational states
 class Initializing(State):
-
     '''
     The child state where K9 is waiting and appears dormant
     '''
+
     def __init__(self):
         super(Initializing, self).__init__()
 
@@ -197,15 +197,15 @@ class Initializing(State):
         # Various events that can come from the watch...
         print("Event: " + event)
         if event == "initialized":
-            return Awake
+            return Awake()
         return self
 
 
 class Asleep(State):
-
     '''
     The child state where K9 is appears dormant
     '''
+
     def __init__(self):
         super(Asleep, self).__init__()
         # turn all lights off
@@ -217,15 +217,15 @@ class Asleep(State):
 
     def on_event(self, event):
         if event == 'WAKE_UP_WATCHSTRING':
-            return Awake
+            return Awake()
         return self
 
 
 class Awake(State):
-
     '''
     The child state where K9 is waiting and appears dormant
     '''
+
     def __init__(self):
         super(Awake, self).__init__()
         # turn on lights
@@ -236,17 +236,17 @@ class Awake(State):
 
     def on_event(self, event):
         if event == 'FOLLOW_WATCHSTRING':
-            return Scanning
+            return Scanning()
         if event == 'SLEEP_WATCHSTRING':
-            return Asleep
+            return Asleep()
         return self
 
 
 class Scanning(State):
-
     '''
     The child state where K9 is looking for the nearest person to follow
     '''
+
     def __init__(self):
         super(Scanning, self).__init__()
         print('Entering state:', str(self))
@@ -277,10 +277,10 @@ class Scanning(State):
 
 
 class Turning(State):
-
     '''
     The child state where K9 is turning towards the target person
     '''
+
     def __init__(self):
         super(Turning, self).__init__()
         print('Entering state:', str(self))
@@ -305,9 +305,9 @@ class Turning(State):
         if event == 'move_forward':
             return Moving_Forward()
         if event == 'turn_finished':
-            return Scanning
+            return Scanning()
         if event == 'target_reached':
-            return Scanning
+            return Scanning()
         return self
 
 
