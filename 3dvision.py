@@ -180,22 +180,21 @@ class Initializing(State):
     The child state where K9 is waiting and appears dormant
     '''
     def __init__(self):
-        k9.speak("All systems initializing")
-        time.sleep(2.0)
-        # Connect to the local Espruino controller
-        k9.last_message = ""
-        k9.client = mqtt.Client("k9-python")
-        k9.client.connect("localhost")
-        k9.on_event('initialized')
+        pass
 
     def run(self):
         # Waits for a command from Espruino Watch
-        pass
+        k9.speak("All systems initializing")
+        k9.last_message = ""
+        k9.client = mqtt.Client("k9-python")
+        k9.client.connect("localhost")
+        time.sleep(2.0)
+        k9.on_event('initialized')
 
     def on_event(self, event):
         # Various events that can come from the watch...
         print("Event: " + event)
-        if event == "TURN_ON_WATCHSTRING":
+        if event == "initialized":
             return Awake
         return self
 
