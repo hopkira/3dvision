@@ -470,7 +470,6 @@ def on_message(client, userdata, message):
     Enables K9 to receive a message from an Epruino Watch via
     MQTT over Bluetooth (BLE) to place it into active or inactive States
     """
-    global last_message
     payload = str(message.payload.decode("utf-8"))
     if payload != k9.last_message:
         k9.last_message = payload
