@@ -186,17 +186,18 @@ class Initializing(State):
 
     def __init__(self):
         super(Initializing, self).__init__()
+        k9.speak("Systems booting")
+        time.sleep(2.0)
+        k9.on_event('initialized')
 
     def run(self):
         # Waits for a command from Espruino Watch
-        k9.speak("All systems initializing")
-        time.sleep(2.0)
-        k9.on_event('initialized')
+        k9.client.loop(0.05)
 
     def on_event(self, event):
         # Various events that can come from the watch...
         print("Event: " + event)
-        if event == "initialized":
+        if event == "K9Mwakon":
             return Awake()
         return self
 
@@ -213,10 +214,11 @@ class Asleep(State):
         k9.speak("Conserving battery power")
 
     def run(self):
-        pass
+        # Waits for a command from Espruino Watch
+        k9.client.loop(0.05)
 
     def on_event(self, event):
-        if event == 'WAKE_UP_WATCHSTRING':
+        if event == 'K9Mwakon':
             return Awake()
         return self
 
@@ -229,15 +231,15 @@ class Awake(State):
     def __init__(self):
         super(Awake, self).__init__()
         # turn on lights
-        k9.speak("Command received")
+        k9.speak("K9 operational")
 
     def run(self):
-        pass
+        k9.client.loop(0.05)
 
     def on_event(self, event):
-        if event == 'FOLLOW_WATCHSTRING':
+        if event == 'Chefolon':
             return Scanning()
-        if event == 'SLEEP_WATCHSTRING':
+        if event == 'K9Mwakoff':
             return Asleep()
         return self
 
