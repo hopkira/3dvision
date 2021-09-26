@@ -256,7 +256,7 @@ class Scanning(State):
 
     def run(self):
         # Checks for the nearest person in the field of vision
-        k9.client.loop(0.05)
+        k9.client.loop(0.1)
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for nnet_packet in nnet_packets:
             detections = list(nnet_packet.getDetectedObjects())
@@ -301,7 +301,7 @@ class Turning(State):
                 k9.on_event="target_reached"
 
     def run(self):
-        k9.client.loop(0.05)
+        k9.client.loop(0.1)
         # Checks to see if motors have stopped
         if not logo.motors_moving:
             k9.on_event="turn_finished"
@@ -333,7 +333,7 @@ class Moving_Forward(State):
             logo.forwards(distance)
 
     def run(self):
-        k9.client.loop(0.05)
+        k9.client.loop(0.1)
         # Wait until move finishes and return to target scanning
         # or detect that a collision is imminent and stop
         if not logo.motors_moving:
