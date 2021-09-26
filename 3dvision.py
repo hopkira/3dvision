@@ -53,9 +53,10 @@ MAX_DIST = args['max']
 MIN_DIST = args['min']
 CONF = args['conf']
 SAFETY_MARGIN = args['safe']
-SWEET_SPOT = (MAX_DIST - MIN_DIST - SAFETY_MARGIN) / 2.0
+S_SPOT_BUFFR = (MAX_DIST - MIN_DIST - SAFETY_MARGIN) / 2.0
+SWEET_SPOT = S_SPOT_BUFFR + MIN_DIST + SAFETY_MARGIN
 
-print("Sweet spot is",SWEET_SPOT,"from robot")
+print("Sweet spot is",SWEET_SPOT,"meters from robot")
 
 # These values control K9s voice
 SPEED_DEFAULT = 150
