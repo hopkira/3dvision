@@ -157,7 +157,6 @@ class State(object):
         Incoming events processing is delegated to the child State
         to define and enable the valid state transitions.
         '''
-        pass
 
     def run(self):
         '''
@@ -185,7 +184,7 @@ class Initializing(State):
     The child state where K9 is waiting and appears dormant
     '''
     def __init__(self):
-        pass
+        super(Initializing, self).__init__()
 
     def run(self):
         # Waits for a command from Espruino Watch
@@ -207,6 +206,7 @@ class Asleep(State):
     The child state where K9 is appears dormant
     '''
     def __init__(self):
+        super(Asleep, self).__init__()
         # turn all lights off
         logo.stop()
         k9.speak("Conserving battery power")
@@ -226,6 +226,7 @@ class Awake(State):
     The child state where K9 is waiting and appears dormant
     '''
     def __init__(self):
+        super(Awake, self).__init__()
         # turn on lights
         k9.speak("Command received")
 
@@ -246,6 +247,7 @@ class Scanning(State):
     The child state where K9 is looking for the nearest person to follow
     '''
     def __init__(self):
+        super(Scanning, self).__init__()
         print('Entering state:', str(self))
         print('Waiting for the closest person to be detected...')
         k9.target = None
@@ -279,6 +281,7 @@ class Turning(State):
     The child state where K9 is turning towards the target person
     '''
     def __init__(self):
+        super(Turning, self).__init__()
         print('Entering state:', str(self))
         z = float(k9.target.depth_z)
         x = float(k9.target.depth_x)
@@ -313,6 +316,7 @@ class Moving_Forward(State):
     The child state where K9 is moving forwards to the target
     '''
     def __init__(self):
+        super(Moving_Forward, self).__init__()
         print('Entering state:', str(self))
         z = float(k9.target.depth_z)
         distance = float(z - SWEET_SPOT)
@@ -364,7 +368,7 @@ class K9(object):
         '''
 
         # The next state will be the result of the on_event function.
-        print("State: " + str(self.state) + " Event: " + event)
+        print("State: " + str(self.state) + ", Event: " + event)
         self.state = self.state.on_event(event)
 
     def speak(self,speech):
