@@ -49,8 +49,8 @@ args = vars(ap.parse_args())
 
 print(args)
 
-MIN_DIST = args['max']
-MAX_DIST = args['min']
+MAX_DIST = args['max']
+MIN_DIST = args['min']
 CONF = args['conf']
 SAFETY_MARGIN = args['safe']
 SWEET_SPOT = (MAX_DIST - MIN_DIST - SAFETY_MARGIN) / 2.0
