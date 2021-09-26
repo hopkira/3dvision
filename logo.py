@@ -91,7 +91,7 @@ def stop():
     '''Lock motors to stop motion
     '''
     global rc
-    print("Stopping")
+    # print("Stopping")
     if not sim:
         rc.SpeedM1M2(address=rc_address, m1=0, m2=0)
         #rc.SpeedAccelDistanceM1M2(address=rc_address,
@@ -101,7 +101,7 @@ def stop():
         #                          speed2=0,
         #                          distance2=0,
         #                          buffer=int(1))
-    print("Stop done")
+    # print("Stop done")
 
 def get_speed():
     ''' Returns speeds of motors
@@ -135,7 +135,7 @@ def calc_turn_modifier(radius):
     '''
     radius = abs(radius)
     turn_modifier = 1 - (0.9/(radius+1))
-    print("Turn modifier is: " + str(turn_modifier))
+    print("logo: calc_turn_modifier: " + str(turn_modifier))
     return turn_modifier
 
 def calc_click_vel(clicks, turn_mod):
@@ -152,7 +152,7 @@ def calc_click_vel(clicks, turn_mod):
     click_vel = math.sqrt(abs(float(2*clicks*ACCELERATION*turn_mod)))
     if (click_vel > TOPSPEED*turn_mod):
         click_vel = TOPSPEED*turn_mod
-    print("Calculated target velocity: " + str(click_vel*sign_modifier))
+    print("logo: calc_click_vel: " + str(click_vel*sign_modifier))
     return click_vel*sign_modifier
 
 def calc_accel(velocity, distance):
@@ -175,7 +175,7 @@ def forward(distance):
     clicks = int(round(distance/CLICK2METRES))
     click_vel = calc_click_vel(clicks=clicks, turn_mod=1)
     accel = calc_accel(click_vel, clicks/2)
-    print("Clicks: " + str(clicks) + " Velocity: " + str(click_vel))
+    print("logo fd: clicks: " + str(clicks) + " velocity: " + str(click_vel))
     if not sim:                       
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                   accel=accel,
@@ -225,8 +225,7 @@ def left(angle):
                                   speed2=int(0),
                                   distance2=abs(int(round(clicks/2))),
                                   buffer=int(0))
-    print("Spinning robot...")
-    print("Speed=" + str(click_vel) + " Distance=" + str(clicks) + "\n")
+    print("logo lt: speed=" + str(click_vel) + " distance=" + str(clicks) + "\n")
 
 lt = left
 
@@ -274,9 +273,8 @@ def arc(radius, extent):
                                     speed2=int(0),
                                     distance2=int(round(distance2/2)),
                                     buffer=int(0))
-    print("Moving in arc...")
-    print("M1 Speed=" + str(click_vel1) + " Distance=" + str(distance1))
-    print("M2 Speed=" + str(click_vel2) + " Distance=" + str(distance2) + "\n")
+    print("logo arc: m1 speed=" + str(click_vel1) + " distance=" + str(distance1))
+    print("logo arc: m2 speed=" + str(click_vel2) + " distance=" + str(distance2) + "\n")
 
 circle = arc
 
@@ -284,7 +282,7 @@ def init_rc():
     global rc
     global rc_address
     #  Initialise the roboclaw motorcontroller
-    print("Initialising roboclaw driver...")
+    print("logo: initialising roboclaw driver...")
     from roboclaw_3 import Roboclaw
     rc_address = 0x80
     rc = Roboclaw("/dev/roboclaw", 115200)
@@ -292,10 +290,10 @@ def init_rc():
     # Get roboclaw version to test if is attached
     version = rc.ReadVersion(rc_address)
     if version[0] is False:
-        print("Roboclaw get version failed")
+        print("logo init: roboclaw get version failed")
         sys.exit()
     else:
-        print(repr(version[1]))
+        print("logo init:",repr(version[1]))
 
     # Set motor controller variables to those required by K9
     rc.SetM1VelocityPID(rc_address, M1_P, M1_I, M1_D, M1_QPPS)
@@ -308,21 +306,21 @@ def init_rc():
     # Print Motor PID Settings
     m1pid = rc.ReadM1VelocityPID(rc_address)
     m2pid = rc.ReadM2VelocityPID(rc_address)
-    print("M1 P: " + str(m1pid[1]) + ", I:" + str(m1pid[2]) + ", D:" + str(m1pid[3]))
-    print("M2 P: " + str(m2pid[1]) + ", I:" + str(m2pid[2]) + ", D:" + str(m2pid[3]))
+    print("logo init: m1 p: " + str(m1pid[1]) + ", i:" + str(m1pid[2]) + ", d:" + str(m1pid[3]))
+    print("m2 p: " + str(m2pid[1]) + ", i:" + str(m2pid[2]) + ", d:" + str(m2pid[3]))
     # Print Min and Max Main Battery Settings
     minmaxv = rc.ReadMinMaxMainVoltages(rc_address) # get min max volts
-    print ("Min Main Battery: " + str(int(minmaxv[1])/10) + "V")
-    print ("Max Main Battery: " + str(int(minmaxv[2])/10) + "V")
+    print ("logo init: min main battery: " + str(int(minmaxv[1])/10) + "V")
+    print ("logo init: max main battery: " + str(int(minmaxv[2])/10) + "V")
     # Print S3, S4 and S5 Modes
     S3mode=['Default','E-Stop (latching)','E-Stop','Voltage Clamp','Undefined']
     S4mode=['Disabled','E-Stop (latching)','E-Stop','Voltage Clamp','M1 Home']
     S5mode=['Disabled','E-Stop (latching)','E-Stop','Voltage Clamp','M2 Home']
     pinfunc = rc.ReadPinFunctions(rc_address)
-    print ("S3 pin: " + S3mode[pinfunc[1]])
-    print ("S4 pin: " + S4mode[pinfunc[2]])
-    print ("S5 pin: " + S5mode[pinfunc[3]])
-    print("Roboclaw motor controller initialised...")
+    print ("logo init: s3 pin: " + S3mode[pinfunc[1]])
+    print ("logo init: s4 pin: " + S4mode[pinfunc[2]])
+    print ("logo init: s5 pin: " + S5mode[pinfunc[3]])
+    print("logo init: roboclaw motor controller initialised...")
 
 # if executed from the command line then execute arguments as functions
 if __name__ == '__main__':
