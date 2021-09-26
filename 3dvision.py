@@ -173,123 +173,6 @@ class State(object):
         '''
         return self.__class__.__name__
 
-
-class K9(object):
-    '''
-    A K9 finite state machine that starts in waiting state and
-    will transition to a new state on when a transition event occurs.
-    It also supports a run command to enable each state to have its
-    own specific behaviours
-    '''
-
-    def __init__(self):
-        ''' Initialise K9 in his waiting state. '''
-
-        # Start with initializing actions
-        self.state = Initializing()
-
-    def run(self):
-        ''' Run the behaviour of the current K9 state using its run function'''
-
-        self.state.run()
-
-    def on_event(self, event):
-        '''
-        Process the incoming event using the on_event function of the
-        current K9 state.  This may result in a change of state.
-        '''
-
-        # The next state will be the result of the on_event function.
-        print("State: " + str(self.state) + " Event: " + event)
-        self.state = self.state.on_event(event)
-
-    def speak(self,speech):
-        '''
-        Break speech up into clauses and speak each one with
-        various pitches, volumes and distortions
-        to make the voice more John Leeson like
-        '''
-        
-        print(speech)
-        clauses = speech.split("|")
-        for clause in clauses:
-            if clause and not clause.isspace():
-                if clause[:1] == ">":
-                    clause = clause[1:]
-                    pitch = PITCH_DEFAULT
-                    speed = SPEED_DOWN
-                    amplitude = AMP_UP
-                    sox_vol = SOX_VOL_UP
-                    sox_pitch = SOX_PITCH_UP
-                elif clause[:1] == "<":
-                    clause = clause[1:]
-                    pitch = PITCH_DOWN
-                    speed = SPEED_DOWN
-                    amplitude = AMP_DOWN
-                    sox_vol = SOX_VOL_DOWN
-                    sox_pitch = SOX_PITCH_DOWN
-                else:
-                    pitch = PITCH_DEFAULT
-                    speed = SPEED_DEFAULT
-                    amplitude = AMP_DEFAULT
-                    sox_vol = SOX_VOL_DEFAULT
-                    sox_pitch = SOX_PITCH_DEFAULT
-                cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z --stdout|play -v %s - synth sine fmod 25 pitch %s" % (clause, pitch, speed, amplitude, sox_vol, sox_pitch)
-                os.system(cmd)
-
-    def scan(self):
-        '''
-        Retrieve a 40 element array derived from the 3D camera
-        '''
-        nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
-        packet = [packet for packet in data_packets if packet.stream_name == 'depth']
-        frame = packet.getData()
-        # create a specific frame for display
-        image_frame = np.copy(frame)
-        # Process depth map to communicate to robot
-        frame = skim.block_reduce(frame,(decimate,decimate),np.min)
-        height, width = frame.shape
-        # Convert depth map to point cloud with valid depths
-        column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
-        valid = (frame > 200) & (frame < max_dist)
-        z = np.where(valid, frame, 0)
-        x = np.where(valid, (z * (column - cx) /cx / fx) + 120 , max_dist)
-        y = np.where(valid, 325 - (z * (row - cy) / cy / fy) , max_dist)
-        # Flatten point cloud axes
-        z2 = z.flatten()
-        x2 = x.flatten()
-        y2 = y.flatten()
-        # Stack the x, y and z co-ordinates into a single 2D array
-        cloud = np.column_stack((x2,y2,z2))
-        # Filter the array by x and y co-ordinates
-        in_scope = (cloud[:,1]<800) & (cloud[:,1] > 0) & (cloud[:,0]<2000) & (cloud[:,0] > -2000)
-        in_scope = np.repeat(in_scope, 3)
-        in_scope = in_scope.reshape(-1, 3)
-        scope = np.where(in_scope, cloud, np.nan)
-        # Remove invalid rows from array
-        scope = scope[~np.isnan(scope).any(axis=1)]
-        # Index each point into 10cm x and y bins (40 x 8)
-        x_index = pd.cut(scope[:,0], x_bins)
-        y_index = pd.cut(scope[:,1], y_bins)
-        # Place the depth values into the corresponding bin
-        binned_depths = pd.Series(scope[:,2])
-        # Average the depth measures in each bin
-        totals = binned_depths.groupby([y_index, x_index]).mean()
-        # Reshape the bins into a 8 x 40 matrix
-        totals = totals.values.reshape(8,40)
-        # Determine the nearest segment for each of the 40
-        # horizontal segments
-        closest = np.amin(totals, axis = 0 )
-        # Round the to the nearest 10cm
-        closest = np.around(closest,-2)
-        # Turn into a 1D array
-        closest = closest.reshape(1,-1)
-        # print(closest)
-        return closest
-
-# Create the k9 finite state machine
-k9 = K9()
-
 # Declare the basic K9 operational states
 class Initializing(State):
 
@@ -453,6 +336,122 @@ class Moving_Forward(State):
             return Scanning()
         return self
 
+
+class K9(object):
+    '''
+    A K9 finite state machine that starts in waiting state and
+    will transition to a new state on when a transition event occurs.
+    It also supports a run command to enable each state to have its
+    own specific behaviours
+    '''
+
+    def __init__(self):
+        ''' Initialise K9 in his waiting state. '''
+
+        # Start with initializing actions
+        self.state = Initializing()
+
+    def run(self):
+        ''' Run the behaviour of the current K9 state using its run function'''
+
+        self.state.run()
+
+    def on_event(self, event):
+        '''
+        Process the incoming event using the on_event function of the
+        current K9 state.  This may result in a change of state.
+        '''
+
+        # The next state will be the result of the on_event function.
+        print("State: " + str(self.state) + " Event: " + event)
+        self.state = self.state.on_event(event)
+
+    def speak(self,speech):
+        '''
+        Break speech up into clauses and speak each one with
+        various pitches, volumes and distortions
+        to make the voice more John Leeson like
+        '''
+        
+        print(speech)
+        clauses = speech.split("|")
+        for clause in clauses:
+            if clause and not clause.isspace():
+                if clause[:1] == ">":
+                    clause = clause[1:]
+                    pitch = PITCH_DEFAULT
+                    speed = SPEED_DOWN
+                    amplitude = AMP_UP
+                    sox_vol = SOX_VOL_UP
+                    sox_pitch = SOX_PITCH_UP
+                elif clause[:1] == "<":
+                    clause = clause[1:]
+                    pitch = PITCH_DOWN
+                    speed = SPEED_DOWN
+                    amplitude = AMP_DOWN
+                    sox_vol = SOX_VOL_DOWN
+                    sox_pitch = SOX_PITCH_DOWN
+                else:
+                    pitch = PITCH_DEFAULT
+                    speed = SPEED_DEFAULT
+                    amplitude = AMP_DEFAULT
+                    sox_vol = SOX_VOL_DEFAULT
+                    sox_pitch = SOX_PITCH_DEFAULT
+                cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z --stdout|play -v %s - synth sine fmod 25 pitch %s" % (clause, pitch, speed, amplitude, sox_vol, sox_pitch)
+                os.system(cmd)
+
+    def scan(self):
+        '''
+        Retrieve a 40 element array derived from the 3D camera
+        '''
+        nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
+        packet = [packet for packet in data_packets if packet.stream_name == 'depth']
+        frame = packet.getData()
+        # create a specific frame for display
+        image_frame = np.copy(frame)
+        # Process depth map to communicate to robot
+        frame = skim.block_reduce(frame,(decimate,decimate),np.min)
+        height, width = frame.shape
+        # Convert depth map to point cloud with valid depths
+        column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
+        valid = (frame > 200) & (frame < max_dist)
+        z = np.where(valid, frame, 0)
+        x = np.where(valid, (z * (column - cx) /cx / fx) + 120 , max_dist)
+        y = np.where(valid, 325 - (z * (row - cy) / cy / fy) , max_dist)
+        # Flatten point cloud axes
+        z2 = z.flatten()
+        x2 = x.flatten()
+        y2 = y.flatten()
+        # Stack the x, y and z co-ordinates into a single 2D array
+        cloud = np.column_stack((x2,y2,z2))
+        # Filter the array by x and y co-ordinates
+        in_scope = (cloud[:,1]<800) & (cloud[:,1] > 0) & (cloud[:,0]<2000) & (cloud[:,0] > -2000)
+        in_scope = np.repeat(in_scope, 3)
+        in_scope = in_scope.reshape(-1, 3)
+        scope = np.where(in_scope, cloud, np.nan)
+        # Remove invalid rows from array
+        scope = scope[~np.isnan(scope).any(axis=1)]
+        # Index each point into 10cm x and y bins (40 x 8)
+        x_index = pd.cut(scope[:,0], x_bins)
+        y_index = pd.cut(scope[:,1], y_bins)
+        # Place the depth values into the corresponding bin
+        binned_depths = pd.Series(scope[:,2])
+        # Average the depth measures in each bin
+        totals = binned_depths.groupby([y_index, x_index]).mean()
+        # Reshape the bins into a 8 x 40 matrix
+        totals = totals.values.reshape(8,40)
+        # Determine the nearest segment for each of the 40
+        # horizontal segments
+        closest = np.amin(totals, axis = 0 )
+        # Round the to the nearest 10cm
+        closest = np.around(closest,-2)
+        # Turn into a 1D array
+        closest = closest.reshape(1,-1)
+        # print(closest)
+        return closest
+
+# Create the k9 finite state machine
+k9 = K9()
 
 #client.publish("test/message","did you get this?")
 def on_message(client, userdata, message):
