@@ -194,7 +194,7 @@ class Initializing(State):
     def on_event(self, event):
         # Various events that can come from the watch...
         print("Event: " + event)
-        if event == "K9Mwakon":
+        if event == "k9mwakon":
             return Awake()
         return self
 
@@ -215,7 +215,7 @@ class Asleep(State):
         k9.client.loop(0.1)
 
     def on_event(self, event):
-        if event == 'K9Mwakon':
+        if event == 'k9mwakon':
             return Awake()
         return self
 
@@ -234,9 +234,9 @@ class Awake(State):
         k9.client.loop(0.1)
 
     def on_event(self, event):
-        if event == 'Chefolon':
+        if event == 'chefolon':
             return Scanning()
-        if event == 'K9Mwakoff':
+        if event == 'k9mwakoff':
             return Asleep()
         return self
 
