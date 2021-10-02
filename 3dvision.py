@@ -331,7 +331,7 @@ class Moving_Forward(State):
         # if check between the values of x and y is less than
         # SAFETY_MARGIN + MIN DIST, then stop
         check = k9.scan()
-        if check.size:
+        if len(check) > 0:
             min_dist = np.amin(check[17:25])
             if min_dist < SWEET_SPOT:
                 k9.on_event('move_finished')
