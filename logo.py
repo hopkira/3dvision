@@ -13,7 +13,7 @@ import math
 import sys
 import argparse
 
-ƒsys.path.append('/home/pi/k9-chess-angular/python')
+sys.path.append('/home/pi/k9-chess-angular/python')
 
 sim = False
 
