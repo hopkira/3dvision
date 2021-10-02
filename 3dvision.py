@@ -291,8 +291,8 @@ class Turning(State):
         z = float(k9.target.depth_z)
         x = float(k9.target.depth_x)
         angle = ( math.pi / 2 ) - math.atan2(z, x)
-        print("Moving ",angle," radians towards target")
         if abs(angle) > 0.2 :
+            print("Moving ",angle," radians towards target")
             logo.right(angle)
 
     def run(self):
