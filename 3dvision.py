@@ -294,6 +294,8 @@ class Turning(State):
         if abs(angle) > 0.2 :
             print("Moving ",angle," radians towards target")
             logo.right(angle)
+        else:
+            k9.on_event == 'turn_finished'
 
     def run(self):
         k9.client.loop(0.1)
