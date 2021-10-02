@@ -269,7 +269,7 @@ class Scanning(State):
                 if len(people) >= 1 :
                     k9.target = min(people, key=attrgetter('depth_z'))
                     k9.on_event('person_found')
-        if k9.target is None and logo.motors_moving:
+        if k9.target is None and logo.motors_moving():
             logo.stop()
 
     def on_event(self, event):
@@ -298,7 +298,7 @@ class Turning(State):
     def run(self):
         k9.client.loop(0.1)
         # Checks to see if motors have stopped
-        if not logo.motors_moving:
+        if not logo.motors_moving():
             k9.on_event="turn_finished"
 
     def on_event(self, event):
@@ -327,7 +327,7 @@ class Moving_Forward(State):
         k9.client.loop(0.1)
         # Wait until move finishes and return to target scanning
         # or detect that a collision is imminent and stop
-        if not logo.motors_moving:
+        if not logo.motors_moving():
             k9.on_event="move_finished"
         # if check between the values of x and y is less than
         # SAFETY_MARGIN + MIN DIST, then stop
