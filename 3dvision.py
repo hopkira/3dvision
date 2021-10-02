@@ -44,7 +44,7 @@ ap.add_argument("-i", "--min", type=float, default=0.3,
 	help="Minimium distance")
 ap.add_argument("-s", "--safe", type=float, default=0.15,
 	help="Safe distance")
-ap.add_argument("-c", "--conf", type=float, default=0.6,
+ap.add_argument("-c", "--conf", type=float, default=0.4,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
