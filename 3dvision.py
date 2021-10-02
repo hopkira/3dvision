@@ -38,13 +38,13 @@ from operator import attrgetter
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-a", "--max", type=float, default=2.0,
+ap.add_argument("-a", "--max", type=float, default=2.5,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default=0.5,
 	help="Minimium distance")
-ap.add_argument("-s", "--safe", type=float, default=0.5,
+ap.add_argument("-s", "--safe", type=float, default=0.3,
 	help="Safe distance")
-ap.add_argument("-c", "--conf", type=float, default=0.85,
+ap.add_argument("-c", "--conf", type=float, default=0.7,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
