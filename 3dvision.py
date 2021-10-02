@@ -355,8 +355,10 @@ class Moving_Forward(State):
     def on_event(self, event):
         if event == 'chefoloff':
             return Awake()
-        if event == 'move_finished' or event == 'person_found':
+        if event == 'move_finished' 
             return Scanning()
+        if event == 'person_found':
+            return Following()
         return self
 
 class Following(State):
