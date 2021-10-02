@@ -250,7 +250,7 @@ class Scanning(State):
     def __init__(self):
         super(Scanning, self).__init__()
         print('Waiting for the closest person to be detected...')
-        k9.speak("Finding person to follow")
+        # k9.speak("Finding person to follow")
         k9.target = None
 
     def run(self):
