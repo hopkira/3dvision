@@ -257,9 +257,9 @@ class Scanning(State):
         super(Scanning, self).__init__()
         print('Waiting for the closest person to be detected...')
         # k9.speak("Finding person to follow")
-        k9.target = None
 
     def run(self):
+        k9.target = None
         # Checks for the nearest person in the field of vision
         k9.client.loop(0.1)
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
@@ -364,7 +364,7 @@ class K9(object):
         ''' Initialise K9 in his waiting state. '''
 
         # Start with initializing actions
-        if args['active']==True:
+        if args['active'] == True:
             self.state = Scanning()
         else:
             self.state = Initializing()
