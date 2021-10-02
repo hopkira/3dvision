@@ -268,7 +268,7 @@ class Scanning(State):
         # if detection.depth_z < MAX_DIST
         k9.client.loop(0.1)
         if (time.time() - k9.started_scan) > 10.0 and logo.finished_move():
-            logo.lt(0.1)
+            logo.lt(0.524)
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for nnet_packet in nnet_packets:
             detections = list(nnet_packet.getDetectedObjects())
