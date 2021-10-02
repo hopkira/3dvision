@@ -38,7 +38,7 @@ from operator import attrgetter
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-a", "--max", type=float, default=2.0,
+ap.add_argument("-a", "--max", type=float, default=1.0,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default=0.3,
 	help="Minimium distance")
@@ -267,7 +267,6 @@ class Scanning(State):
             if detections is not None:
                 people = [detection for detection in detections
                             if detection.label == 15
-                            if detection.depth_z < MAX_DIST
                             if detection.confidence > CONF]
                 if len(people) >= 1 :
                     k9.target = min(people, key=attrgetter('depth_z'))
