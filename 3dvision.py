@@ -9,9 +9,10 @@ Args:
     -i, --min (float): Minimum distance to follow
     -s, --safe (float): Addiitional safety margin
     -c, --conf (float): Confidence level
+    -x, --exec (bool):  Start in active mode
 
 Example:
-    $ python3 3dvision.py -a 2.0 -i 0.2 -s 0.1 -c 0.75
+    $ python3 3dvision.py -a 2.0 -i 0.2 -s 0.1 -c 0.75 --active
 
 Todo:
     * stuff
@@ -45,6 +46,11 @@ ap.add_argument("-s", "--safe", type=float, default=0.5,
 	help="Safe distance")
 ap.add_argument("-c", "--conf", type=float, default=0.85,
 	help="Confidence")
+ap.add_argument('--active', dest='active', action='store_true',
+    help="Active mode")
+ap.add_argument('--inactive', dest='active', action='store_false',
+    help="Inactive mode")
+ap.set_defaults(active = False)    
 args = vars(ap.parse_args())
 
 print(args)
@@ -358,7 +364,10 @@ class K9(object):
         ''' Initialise K9 in his waiting state. '''
 
         # Start with initializing actions
-        self.state = Initializing()
+        if args['active']==True:
+            self.state = Scanning()
+        else:
+            self.state = Initializing()
         self.last_message = ""
         self.client = mqtt.Client("k9-python")
         self.client.connect("localhost")
