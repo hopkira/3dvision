@@ -38,13 +38,13 @@ from operator import attrgetter
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-a", "--max", type=float, default=1.0,
+ap.add_argument("-a", "--max", type=float, default=2.0,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default=0.3,
 	help="Minimium distance")
 ap.add_argument("-s", "--safe", type=float, default=0.15,
 	help="Safe distance")
-ap.add_argument("-c", "--conf", type=float, default=0.7,
+ap.add_argument("-c", "--conf", type=float, default=0.70,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
@@ -130,10 +130,6 @@ def nn_to_depth_coord(x, y, nn2depth):
 detections = []
 angle = 0.0
 last_seen = 0.05
-MIN_DIST = 0.5
-MAX_DIST = 3.0
-CONF = 0.85
-SAFETY_MARGIN = 0.5
 
 decimate = 20
 max_dist = 4000.0
@@ -271,6 +267,7 @@ class Scanning(State):
             if detections is not None:
                 people = [detection for detection in detections
                             if detection.label == 15
+                            if detection.depth_z < MAX_DIST
                             if detection.confidence > CONF]
                 if len(people) >= 1 :
                     k9.target = min(people, key=attrgetter('depth_z'))
