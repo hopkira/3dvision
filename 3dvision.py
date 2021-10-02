@@ -295,13 +295,13 @@ class Turning(State):
             print("Moving ",angle," radians towards target")
             logo.right(angle)
         else:
-            k9.on_event == 'turn_finished'
+            k9.on_event('turn_finished')
 
     def run(self):
         k9.client.loop(0.1)
         # Checks to see if motors have stopped
         if logo.finished_move():
-            k9.on_event="turn_finished"
+            k9.on_event('turn_finished')
 
     def on_event(self, event):
         if event == 'chefoloff':
@@ -330,13 +330,13 @@ class Moving_Forward(State):
         # Wait until move finishes and return to target scanning
         # or detect that a collision is imminent and stop
         if logo.finished_move():
-            k9.on_event="move_finished"
+            k9.on_event('move_finished')
         # if check between the values of x and y is less than
         # SAFETY_MARGIN + MIN DIST, then stop
         check = k9.scan()
         min_dist = np.amin(check[17:25])
         if min_dist < SWEET_SPOT:
-            k9.on_event="move_finished"
+            k9.on_event('move_finished')
 
     def on_event(self, event):
         if event == 'chefoloff':
