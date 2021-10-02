@@ -279,8 +279,8 @@ class Scanning(State):
                 if len(people) >= 1 :
                     k9.target = min(people, key=attrgetter('depth_z'))
                     k9.on_event('person_found')
-        if k9.target is None and not logo.finished_move():
-            logo.stop()
+        #if k9.target is None and not logo.finished_move():
+        #    logo.stop()
 
     def on_event(self, event):
         if event == 'person_found':
