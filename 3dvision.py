@@ -44,7 +44,7 @@ ap.add_argument("-i", "--min", type=float, default=0.3,
 	help="Minimium distance")
 ap.add_argument("-s", "--safe", type=float, default=0.15,
 	help="Safe distance")
-ap.add_argument("-c", "--conf", type=float, default=0.4,
+ap.add_argument("-c", "--conf", type=float, default=0.7,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
@@ -261,6 +261,9 @@ class Scanning(State):
     def run(self):
         k9.target = None
         # Checks for the nearest person in the field of vision
+        # Just removed the following from people = 
+        # if detection.depth_z > MIN_DIST
+        # if detection.depth_z < MAX_DIST
         k9.client.loop(0.1)
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for nnet_packet in nnet_packets:
@@ -268,8 +271,6 @@ class Scanning(State):
             if detections is not None:
                 people = [detection for detection in detections
                             if detection.label == 15
-                            if detection.depth_z > MIN_DIST
-                            if detection.depth_z < MAX_DIST
                             if detection.confidence > CONF]
                 if len(people) >= 1 :
                     k9.target = min(people, key=attrgetter('depth_z'))
@@ -282,6 +283,7 @@ class Scanning(State):
             return Turning()
         if event == 'chefoloff':
             return Awake()
+
         return self
 
 
@@ -341,7 +343,7 @@ class Moving_Forward(State):
             min_dist = np.amin(check[17:25])
             if min_dist < SWEET_SPOT:
                 k9.on_event('move_finished')
-        except ValueError:
+        except (TypeError,ValueError):
             pass
 
     def on_event(self, event):
