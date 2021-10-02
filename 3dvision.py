@@ -192,12 +192,16 @@ class Initializing(State):
     def run(self):
         # Waits for a command from Espruino Watch
         k9.client.loop(0.1)
+        if args['active'] == True:
+            k9.on_event('start_scan')
 
     def on_event(self, event):
         # Various events that can come from the watch...
         print("Event: " + event)
         if event == "k9mwakon":
             return Awake()
+        if event == "start_scan":
+            return Scanning()
         return self
 
 
@@ -253,6 +257,8 @@ class Scanning(State):
         super(Scanning, self).__init__()
         print('Waiting for the closest person to be detected...')
         # k9.speak("Finding person to follow")
+        global started_scan
+        k9.started_scan = time.time()
 
     def run(self):
         k9.target = None
@@ -261,6 +267,8 @@ class Scanning(State):
         # if detection.depth_z > MIN_DIST
         # if detection.depth_z < MAX_DIST
         k9.client.loop(0.1)
+        if (time.time() - k9.started_scan) > 10.0 and logo.finished_move():
+            logo.lt(0.1)
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for nnet_packet in nnet_packets:
             detections = list(nnet_packet.getDetectedObjects())
@@ -362,10 +370,7 @@ class K9(object):
         ''' Initialise K9 in his waiting state. '''
 
         # Start with initializing actions
-        if args['active'] == True:
-            self.state = Scanning()
-        else:
-            self.state = Initializing()
+        self.state = Initializing()
         self.last_message = ""
         self.client = mqtt.Client("k9-python")
         self.client.connect("localhost")
