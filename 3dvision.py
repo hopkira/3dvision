@@ -146,6 +146,8 @@ now_frame = 0
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start = 0, end = 800, periods = 8)
 
+# calculate the horizontal angle per bucket
+h_bucket_fov = 71.0 / 360.0 * 2.0 * math.pi / 40.0
 
 class State(object):
     '''
@@ -346,17 +348,46 @@ class Moving_Forward(State):
         try:
             min_dist = np.amin(check[17:25])
             if min_dist < SWEET_SPOT:
-                k9.on_event('move_finished')
+                k9.on_event('person_found')
         except (TypeError,ValueError):
             pass
 
     def on_event(self, event):
         if event == 'chefoloff':
             return Awake()
-        if event == 'move_finished':
+        if event == 'move_finished' or event == 'person_found':
             return Scanning()
         return self
 
+class Following(State):
+
+    '''
+    Having reached the target, now follow it blindly
+    '''
+    def __init__(self):
+        super(Moving_Forward, self).__init__()
+
+    def run(self):
+        k9.client.loop(0.1)
+        check = k9.scan()
+        try:
+            # calculate the minimum distance to person
+            min_dist = np.amin(check)
+            # determine which indices have min value and average
+            result = np.where(check == min_dist)
+            direction = np.average(result)
+            angle = (result - 20.0 ) * h_bucket_fov
+            if logo.finished_move() and abs(angle > 0.2) :
+                logo.rt(angle)
+            if logo.finished_move() and (min_dist > SWEET_SPOT):
+                logo.fd(min_dist - SWEET_SPOT)
+        except (TypeError,ValueError):
+            pass
+
+    def on_event(self, event):
+        if event == 'chefoloff':
+            return Awake()
+        return self
 
 class K9(object):
     '''
