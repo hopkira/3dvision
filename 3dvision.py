@@ -416,8 +416,8 @@ class K9(object):
         Retrieve a 40 element array derived from the 3D camera
         '''
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
-        packet = [packet for packet in data_packets if packet.stream_name == 'depth']
-        frame = packet.getData()
+        my_packet = [packet for packet in data_packets if packet.stream_name == 'depth']
+        frame = my_packet[-1].getData()
         # create a specific frame for display
         image_frame = np.copy(frame)
         # Process depth map to communicate to robot
