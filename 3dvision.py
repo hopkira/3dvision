@@ -249,7 +249,6 @@ class Scanning(State):
 
     def __init__(self):
         super(Scanning, self).__init__()
-        print('Entering state:', str(self))
         print('Waiting for the closest person to be detected...')
         k9.speak("Finding person to follow")
         k9.target = None
@@ -287,7 +286,6 @@ class Turning(State):
 
     def __init__(self):
         super(Turning, self).__init__()
-        print('Entering state:', str(self))
         z = float(k9.target.depth_z)
         x = float(k9.target.depth_x)
         angle = ( math.pi / 2 ) - math.atan2(z, x)
@@ -318,7 +316,6 @@ class Moving_Forward(State):
     '''
     def __init__(self):
         super(Moving_Forward, self).__init__()
-        print('Entering state:', str(self))
         z = float(k9.target.depth_z)
         distance = float(z - SWEET_SPOT)
         if distance > 0:
