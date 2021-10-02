@@ -13,7 +13,7 @@ import math
 import sys
 import argparse
 
-sys.path.append('/home/pi/k9-chess-angular/python')
+ƒsys.path.append('/home/pi/k9-chess-angular/python')
 
 sim = False
 
@@ -123,6 +123,11 @@ def buffer_full():
     global rc
     buffers = rc.ReadBuffers(rc_address)
     return ((buffers[1] != 0x80) or (buffers[2] != 0x80))
+
+def finished_move():
+    ''' Detects that buffer is empty and motors are at rest
+    '''
+    return not(motors_moving() or buffer_full())
 
 def calc_turn_modifier(radius):
     '''Calculates a velocity modifier; based on the radius
