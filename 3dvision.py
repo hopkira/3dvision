@@ -527,11 +527,15 @@ class K9(object):
                             if detection.label == 15
                             if detection.confidence > CONF]
                 if len(people) >= 1 :
+                    min_angle = math.pi
                     for person in people:
                         z = float(person.depth_z)
                         x = float(person.depth_x)
-                        person.angle = abs(( math.pi / 2 ) - math.atan2(z, x))
-                    return min(people, key=attrgetter('angle'))
+                        angle = abs(( math.pi / 2 ) - math.atan2(z, x))
+                        if angle < min_angle:
+                            min_angle = angle
+                            target = person
+                    return target
 
     def scan(self):
         '''
