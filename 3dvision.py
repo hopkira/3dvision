@@ -566,10 +566,11 @@ class K9(object):
                 # horizontal segments
                 closest = np.amin(totals, axis = 0 )
                 # Round the to the nearest 10cm
-                closest = np.around(closest,-2)
+                closest = np.around(closest)
                 # Turn into a 1D array
                 closest = closest.reshape(1,-1)
-                # print(closest)
+                # Change nan values into large infinite ones
+                closest = closest.nan_to_num(np.inf)
                 return closest
 
     def callback(self, client, userdata, message):
