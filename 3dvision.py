@@ -223,7 +223,7 @@ class Asleep(State):
     def on_event(self, event):
         if event == 'k9mwakon':
             return Awake()
-        if event == 'k9mrigend':
+        if event == 'k9mrigsta':
             return Joystick()
         return self
 
@@ -247,7 +247,7 @@ class Awake(State):
             return Scanning()
         if event == 'k9mwakoff':
             return Asleep()
-        if event == 'k9mrigend':
+        if event == 'k9mrigsta':
             return Joystick()
         return self
 
@@ -291,7 +291,7 @@ class Scanning(State):
             return Turning()
         if event == 'chefoloff':
             return Awake()
-        if event == 'k9mrigend':
+        if event == 'k9mrigsta':
             return Joystick()
         return self
 
@@ -323,7 +323,7 @@ class Turning(State):
             return Awake()
         if event == 'turn_finished':
             return Moving_Forward()
-        if event == 'k9mrigend':
+        if event == 'k9mrigsta':
             return Joystick()
         return self
 
@@ -364,7 +364,7 @@ class Moving_Forward(State):
             return Scanning()
         if event == 'person_found':
             return Following()
-        if event == 'k9mrigend':
+        if event == 'k9mrigsta':
             return Joystick()
         return self
 
@@ -397,7 +397,7 @@ class Following(State):
     def on_event(self, event):
         if event == 'chefoloff':
             return Awake()
-        if event == 'k9mrigend':
+        if event == 'k9mrigsta':
             return Joystick()
         return self
 
