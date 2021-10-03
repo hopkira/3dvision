@@ -34,6 +34,7 @@ import pandas as pd
 import skimage.measure as skim
 import paho.mqtt.client as mqtt
 import logo # K9 movement library
+from subprocess import Popen
 from operator import attrgetter
 
 # construct the argument parser and parse the arguments
@@ -471,7 +472,7 @@ class K9(object):
         '''
 
         # The next state will be the result of the on_event function.
-        print("Event:", event, "in state:", str(self.state))
+        print(event, "raised in state", str(self.state))
         self.state = self.state.on_event(event)
 
     def speak(self,speech):
@@ -482,6 +483,7 @@ class K9(object):
         '''
         
         print('Speech:', speech)
+        self.speaking = None
         clauses = speech.split("|")
         for clause in clauses:
             if clause and not clause.isspace():
@@ -505,8 +507,9 @@ class K9(object):
                     amplitude = AMP_DEFAULT
                     sox_vol = SOX_VOL_DEFAULT
                     sox_pitch = SOX_PITCH_DEFAULT
-                cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z" % (clause, pitch, speed, amplitude)
-                os.system(cmd)
+                #cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z" % (clause, pitch, speed, amplitude)
+                cmd = ['espeak','-v','en-rp',clause,'-p',pitch,'-s',speed,'-a',amplitude]
+                self.speaking = Popen(cmd)
 
     def person_scan(self):
         '''
