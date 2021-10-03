@@ -43,7 +43,7 @@ ap.add_argument("-a", "--max", type=float, default=1.0,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default=0.3,
 	help="Minimium distance")
-ap.add_argument("-s", "--safe", type=float, default=0.2,
+ap.add_argument("-s", "--safe", type=float, default=0.4,
 	help="Safe distance")
 ap.add_argument("-c", "--conf", type=float, default=0.90,
 	help="Confidence")
@@ -567,10 +567,10 @@ class K9(object):
                 closest = np.amin(totals, axis = 0 )
                 # Round the to the nearest 10cm
                 closest = np.around(closest)
-                # Turn into a 1D array
-                closest = closest.reshape(1,-1)
                 # Change nan values into large infinite ones
-                closest = np.nan_to_num(closest, np.inf)
+                closest = np.nan_to_num(closest, nan=4000.0)
+                # Turn into a 1D array
+                closest = closest.flatten
                 return closest
 
     def callback(self, client, userdata, message):
