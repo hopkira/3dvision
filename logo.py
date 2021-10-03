@@ -169,11 +169,13 @@ def calc_click_vel(clicks, turn_mod):
 
     '''
     sign_modifier = 1.0
-    if (clicks < 0):
+    if (clicks < 0.0):
         sign_modifier = -1.0
-    click_vel = math.sqrt(abs(float(2*clicks*ACCELERATION*turn_mod)))
+    click_vel = math.sqrt(abs(float(2.0*clicks*ACCELERATION*turn_mod)))
     if (click_vel > TOPSPEED*turn_mod):
         click_vel = TOPSPEED*turn_mod
+    if (click_vel < 1.0):
+        click_vel = 1.0
     print("logo: calc_click_vel: " + str(click_vel*sign_modifier))
     return click_vel*sign_modifier
 
@@ -184,7 +186,7 @@ def calc_accel(velocity, distance):
     velocity -- the desired change in velocity
     distance -- the distance to change the velocity over
     '''
-    accel = int(abs((velocity**2)/(2*distance)))
+    accel = int(abs((velocity**2.0)/(2.0*distance)))
     return accel
 
 def forward(distance):
@@ -196,22 +198,22 @@ def forward(distance):
     global rc
     clicks = int(round(distance/CLICK2METRES))
     click_vel = calc_click_vel(clicks=clicks, turn_mod=1)
-    accel = calc_accel(click_vel, clicks/2)
+    accel = calc_accel(click_vel, clicks/2.0)
     print("logo fd: clicks: " + str(clicks) + " velocity: " + str(click_vel))
     if not sim:                       
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                   accel=accel,
                                   speed1=int(round(click_vel)),
-                                  distance1=int(abs(clicks/2)),
+                                  distance1=int(abs(clicks/2.0)),
                                   speed2=int(round(click_vel)),
-                                  distance2=int(abs(clicks/2)),
+                                  distance2=int(abs(clicks/2.0)),
                                   buffer=1)
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                   accel=accel,
                                   speed1=0,
-                                  distance1=int(abs(clicks/2)),
+                                  distance1=int(abs(clicks/2.0)),
                                   speed2=0,
-                                  distance2=int(abs(clicks/2)),
+                                  distance2=int(abs(clicks/2.0)),
                                   buffer=0)
 
 fd = fwd = forwards = forward
@@ -231,21 +233,21 @@ def left(angle):
     clicks = TURNING_CIRCLE * fraction
     turn_modifier = calc_turn_modifier(radius = 0)
     click_vel = calc_click_vel(clicks=clicks, turn_mod=turn_modifier)
-    accel = int(abs(click_vel * click_vel / ( 2 * clicks / 2)))
+    accel = int(abs(click_vel * click_vel / ( 2.0 * clicks / 2.0)))
     if not sim:
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                   accel=accel,
                                   speed1=int(round(-click_vel)),
-                                  distance1=abs(int(round(clicks/2))),
+                                  distance1=abs(int(round(clicks/2.0))),
                                   speed2=int(round(click_vel)),
-                                  distance2=abs(int(round(clicks/2))),
+                                  distance2=abs(int(round(clicks/2.0))),
                                   buffer=int(1))
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                   accel=accel,
                                   speed1=int(0),
-                                  distance1=abs(int(round(clicks/2))),
+                                  distance1=abs(int(round(clicks/2.0))),
                                   speed2=int(0),
-                                  distance2=abs(int(round(clicks/2))),
+                                  distance2=abs(int(round(clicks/2.0))),
                                   buffer=int(0))
     print("logo lt: speed=" + str(click_vel) + " distance=" + str(clicks) + "\n")
 
@@ -277,23 +279,23 @@ def arc(radius, extent):
     turn_mod = calc_turn_modifier(radius)
     click_vel1 = calc_click_vel(clicks=distance1, turn_mod=turn_mod)
     click_vel2 = calc_click_vel(clicks=distance2, turn_mod=turn_mod)
-    accel1 = int(abs(click_vel1 * click_vel1 / ( 2 * distance1 / 2)))
-    accel2 = int(abs(click_vel2 * click_vel2 / ( 2 * distance2 / 2)))
+    accel1 = int(abs(click_vel1 * click_vel1 / ( 2.0 * distance1 / 2.0)))
+    accel2 = int(abs(click_vel2 * click_vel2 / ( 2.0 * distance2 / 2.0)))
     accel = max(accel1,accel2)
     if not sim:
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                     accel=accel,
                                     speed1=int(round(click_vel1)),
-                                    distance1=int(round(distance1/2)),
+                                    distance1=int(round(distance1/2.0)),
                                     speed2=int(round(click_vel2)),
-                                    distance2=int(round(distance2/2)),
+                                    distance2=int(round(distance2/2.0)),
                                     buffer=int(1))
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                     accel=accel,
                                     speed1=int(0),
-                                    distance1=int(round(distance1/2)),
+                                    distance1=int(round(distance1/2.0)),
                                     speed2=int(0),
-                                    distance2=int(round(distance2/2)),
+                                    distance2=int(round(distance2/2.0)),
                                     buffer=int(0))
     print("logo arc: m1 speed=" + str(click_vel1) + " distance=" + str(distance1))
     print("logo arc: m2 speed=" + str(click_vel2) + " distance=" + str(distance2) + "\n")
@@ -332,8 +334,8 @@ def init_rc():
     print("m2 p: " + str(m2pid[1]) + ", i:" + str(m2pid[2]) + ", d:" + str(m2pid[3]))
     # Print Min and Max Main Battery Settings
     minmaxv = rc.ReadMinMaxMainVoltages(rc_address) # get min max volts
-    print ("logo init: min main battery: " + str(int(minmaxv[1])/10) + "V")
-    print ("logo init: max main battery: " + str(int(minmaxv[2])/10) + "V")
+    print ("logo init: min main battery: " + str(int(minmaxv[1])/10.0) + "V")
+    print ("logo init: max main battery: " + str(int(minmaxv[2])/10.0) + "V")
     # Print S3, S4 and S5 Modes
     S3mode=['Default','E-Stop (latching)','E-Stop','Voltage Clamp','Undefined']
     S4mode=['Disabled','E-Stop (latching)','E-Stop','Voltage Clamp','M1 Home']
