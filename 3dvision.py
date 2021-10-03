@@ -399,14 +399,13 @@ class Following(State):
             if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
                 logo.stop
             result = np.where(check == min_dist)
-            print("min dis:", min_dist)
+            print("min dist:", min_dist)
             print("indices:", result)
             direction = np.average(result)
             print("avg_indices:", direction)
             angle = (direction - 19.5 ) * h_bucket_fov
             print(angle)
-            if logo.finished_move() and abs(angle > 0.05) :
-                logo.rt(angle)
+            logo.rt(angle)
         #if logo.finished_move() and (min_dist > SWEET_SPOT):
         #    logo.fd(min_dist - SWEET_SPOT)
 
