@@ -78,8 +78,9 @@ def main():
 def motor_speed(m1_speed, m2_speed):
     ''' Make robot move based on joystick
     '''
-    m1_click = int(m1_speed * M1_QPPS)
-    m2_click = int(m2_speed * M2_QPPS)
+    factor = min(M1_QPPS, M2_QPPS)
+    m1_click = int(m1_speed * factor)
+    m2_click = int(m2_speed * factor)
     rc.SpeedAccelM1M2(address=rc_address,
                         accel=ACCELERATION,
                         speed1=m1_click,
