@@ -231,7 +231,6 @@ def left(angle, fast = False):
     global rc
     fraction = angle / ( 2 * math.pi )
     clicks = TURNING_CIRCLE * fraction
-    if clicks < 1.0 : clicks = 1.0
     if not fast:
         turn_modifier = calc_turn_modifier(radius = 0)
     else:
