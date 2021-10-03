@@ -53,8 +53,6 @@ ap.add_argument('--inactive', dest='active', action='store_false',
 ap.set_defaults(active = False)    
 args = vars(ap.parse_args())
 
-print(args)
-
 MAX_DIST = args['max']
 MIN_DIST = args['min']
 CONF = args['conf']
@@ -78,6 +76,8 @@ SOX_VOL_DOWN = 15
 SOX_PITCH_UP = 100
 SOX_PITCH_DEFAULT = 0
 SOX_PITCH_DOWN = -100
+
+JOY_SPEED = 0.05
 
 detections = []
 angle = 0.0
@@ -115,7 +115,6 @@ model_config_file = config["ai"]["blob_file_config"]
 mcf = open(model_config_file)
 model_config_dict = json.load(mcf)
 labels = model_config_dict["mappings"]["labels"]
-print(labels)
 
 if body_cam is None:
     raise RuntimeError("Error initializing body camera")
@@ -199,7 +198,6 @@ class Initializing(State):
 
     def on_event(self, event):
         # Various events that can come from the watch...
-        print("Event: " + event)
         if event == "k9mwakon":
             return Awake()
         if event == "start_scan":
@@ -225,6 +223,8 @@ class Asleep(State):
     def on_event(self, event):
         if event == 'k9mwakon':
             return Awake()
+        if event == 'k9mrigend':
+            return Joystick()
         return self
 
 
@@ -247,6 +247,8 @@ class Awake(State):
             return Scanning()
         if event == 'k9mwakoff':
             return Asleep()
+        if event == 'k9mrigend':
+            return Joystick()
         return self
 
 
@@ -289,7 +291,8 @@ class Scanning(State):
             return Turning()
         if event == 'chefoloff':
             return Awake()
-
+        if event == 'k9mrigend':
+            return Joystick()
         return self
 
 
@@ -304,7 +307,7 @@ class Turning(State):
         x = float(k9.target.depth_x)
         angle = ( math.pi / 2 ) - math.atan2(z, x)
         if abs(angle) > 0.2 :
-            print("Moving ",angle," radians towards target")
+            print("Turning: Moving ",angle," radians towards target")
             logo.right(angle)
         else:
             k9.on_event('turn_finished')
@@ -320,6 +323,8 @@ class Turning(State):
             return Awake()
         if event == 'turn_finished':
             return Moving_Forward()
+        if event == 'k9mrigend':
+            return Joystick()
         return self
 
 
@@ -333,7 +338,7 @@ class Moving_Forward(State):
         z = float(k9.target.depth_z)
         distance = float(z - SWEET_SPOT)
         if distance > 0:
-            print("Target is",z,"m away. Moving forward by",distance,"m")
+            print("Moving Forward: target is",z,"m away. Moving",distance,"m")
             logo.forwards(distance)
 
     def run(self):
@@ -359,7 +364,10 @@ class Moving_Forward(State):
             return Scanning()
         if event == 'person_found':
             return Following()
+        if event == 'k9mrigend':
+            return Joystick()
         return self
+
 
 class Following(State):
 
@@ -389,7 +397,41 @@ class Following(State):
     def on_event(self, event):
         if event == 'chefoloff':
             return Awake()
+        if event == 'k9mrigend':
+            return Joystick()
         return self
+
+
+class Joystick(State):
+
+    '''
+    Having reached the target, now follow it blindly
+    '''
+    def __init__(self):
+        super(Joystick, self).__init__()
+
+    def run(self):
+        k9.client.loop(0.1)
+
+    def on_event(self, event):
+        state = event[:3]
+        direction = event[3:6]
+        action = event[6:]
+        if state != 'joy' or event == 'joyjoyoff':
+            logo.stop()
+            return Awake()
+        if action != 'sta':
+            logo.stop()
+        if direction == 'top':
+            logo.motor_speed(JOY_SPEED, JOY_SPEED)
+        elif direction == 'mid':
+            logo.motor_speed(-JOY_SPEED, -JOY_SPEED)
+        elif direction == 'lef':
+            logo.motor_speed(-JOY_SPEED, JOY_SPEED)
+        elif direction == 'rig':
+            logo.motor_speed(JOY_SPEED, -JOY_SPEED)
+        return self
+
 
 class K9(object):
     '''

@@ -74,12 +74,28 @@ def main():
     else:
         globals()[verb](object1)
 
+
+def motor_speed(m1_speed, m2_speed):
+    ''' Make robot move based on joystick
+    '''
+    m1_click = m1_speed * M1_QPPS
+    m2_click = m2_speed * M2_QPPS
+    rc.SpeedAccelM1M2(address=rc_address,
+                        accel=ACCELERATION,
+                        speed1=m1_click,
+                        speed2=m2_click)
+
+
 def calc_destination(x_pos, y_pos):
+    ''' Calculate destination relative to robot
+    '''
     ret_x = x_pos + CAM_POS_X - TARGET_POS_X
     ret_y = y_pos + CAM_POS_Y - TARGET_POS_Y
     return ret_x, ret_y
 
 def calc_circle_arc(x_pos, y_pos):
+    ''' Calculate a circle arc based on an target position
+    '''
     # following calculation only works for a 90 degree or less field of view
     if x_pos == 0:
         raise ValueError('Cannot calculate circle arc of infinite radius')
