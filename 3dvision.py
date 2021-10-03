@@ -77,7 +77,7 @@ SOX_PITCH_UP = 100
 SOX_PITCH_DEFAULT = 0
 SOX_PITCH_DOWN = -100
 
-JOY_SPEED = 0.05
+JOY_SPEED = 0.03
 
 detections = []
 angle = 0.0
@@ -429,9 +429,9 @@ class Joystick(State):
             elif direction == 'mid':
                 logo.motor_speed(-JOY_SPEED, -JOY_SPEED)
             elif direction == 'lef':
-                logo.motor_speed(-JOY_SPEED, JOY_SPEED)
+                logo.motor_speed(-JOY_SPEED/4, JOY_SPEED/4)
             elif direction == 'rig':
-                logo.motor_speed(JOY_SPEED, -JOY_SPEED)
+                logo.motor_speed(JOY_SPEED/4, -JOY_SPEED/4)
         return self
 
 
