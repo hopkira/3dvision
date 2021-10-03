@@ -307,7 +307,7 @@ class Turning(State):
         # Checks to see if motors have stopped
         test = k9.person_scan()
         if test is not None :
-            k9.target = k9.test
+            k9.target = test
             k9.on_event('new_information')
         if logo.finished_move():
             k9.on_event('turn_finished')
