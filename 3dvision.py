@@ -408,7 +408,9 @@ class Following(State):
             if angle != 0.0 and min_dist <= MAX_DIST:
                 logo.rt(angle, fast = True)
             if abs(angle) < 0.2 and min_dist <= MAX_DIST and min_dist > SWEET_SPOT:
-                logo.fd(min_dist - SWEET_SPOT)
+                dist = min_dist - SWEET_SPOT
+                if abs(dist) > 0.002 :
+                    logo.fd(min_dist - SWEET_SPOT)
         #if logo.finished_move() and (min_dist > SWEET_SPOT):
         #    logo.fd(min_dist - SWEET_SPOT)
 
