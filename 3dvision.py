@@ -392,17 +392,17 @@ class Following(State):
 
     def run(self):
         k9.client.loop(0.1)
-        check = k9.scan()#
+        check = k9.scan()
         if check is not None:
-            min_dist = np.amin(check[17:23])
-            print(min_dist)
+            min_dist = np.amin(check[10:30])
             if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
                 logo.stop
             result = np.where(check == min_dist)
             direction = np.average(result)
             angle = (direction - 20.0 ) * h_bucket_fov
+            print(angle)
             if logo.finished_move() and abs(angle > 0.2) :
-                logo.rt(angle)
+                logo.rt("angle:", angle)
         #if logo.finished_move() and (min_dist > SWEET_SPOT):
         #    logo.fd(min_dist - SWEET_SPOT)
 
