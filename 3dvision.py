@@ -345,12 +345,13 @@ class Moving_Forward(State):
             check = k9.scan() 
             if check is not None:
                 min_dist = np.amin(check[17:25]) # narrow to robot width
+                print("Min dist:", min_dist)
                 if min_dist <= SWEET_SPOT:
                     logo.stop()
                     k9.on_event('target_reached')
-            test = k9.person_scan() # check for person
-            if test is not None :
-                k9.target = test
+            person_seen = k9.person_scan() # check for person
+            if person_seen is not None :
+                k9.target = person_seen
                 z = float(k9.target.depth_z)
                 x = float(k9.target.depth_x)
                 angle = ( math.pi / 2 ) - math.atan2(z, x)
@@ -361,7 +362,7 @@ class Moving_Forward(State):
 
     def on_event(self, event):
         if event == 'new_angle':
-            return Turning
+            return Turning()
         if event == 'new_distance':
             return Moving_Forward()
         if event == 'chefoloff':
