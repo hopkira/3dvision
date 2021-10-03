@@ -345,7 +345,7 @@ class Moving_Forward(State):
         # then stop at the sweet spot
         check = k9.scan()
         if check is not None:
-            print("min_dist:",np.amin(check[17:25]))
+            print("dists:",check[17:25])
         try:
             min_dist = np.amin(check[17:25])
             print("moving_forward: min_dis:", str(min_dist))
