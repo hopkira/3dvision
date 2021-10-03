@@ -234,7 +234,10 @@ def left(angle, fast = False):
     if clicks < 1.0 : clicks = 1.0
     if not fast:
         turn_modifier = calc_turn_modifier(radius = 0)
-        click_vel = calc_click_vel(clicks=clicks, turn_mod=turn_modifier)
+    else:
+        turn_modifier = 1.0
+    click_vel = calc_click_vel(clicks=clicks, turn_mod=turn_modifier)
+    if not fast:
         accel = int(abs(click_vel * click_vel / ( 2.0 * clicks / 2.0)))
     else:
         accel = ACCELERATION
