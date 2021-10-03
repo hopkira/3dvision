@@ -409,6 +409,7 @@ class Joystick(State):
     '''
     def __init__(self):
         super(Joystick, self).__init__()
+        logo.stop()
 
     def run(self):
         k9.client.loop(0.1)
@@ -422,14 +423,15 @@ class Joystick(State):
             return Awake()
         if action != 'sta':
             logo.stop()
-        if direction == 'top':
-            logo.motor_speed(JOY_SPEED, JOY_SPEED)
-        elif direction == 'mid':
-            logo.motor_speed(-JOY_SPEED, -JOY_SPEED)
-        elif direction == 'lef':
-            logo.motor_speed(-JOY_SPEED, JOY_SPEED)
-        elif direction == 'rig':
-            logo.motor_speed(JOY_SPEED, -JOY_SPEED)
+        else:
+            if direction == 'top':
+                logo.motor_speed(JOY_SPEED, JOY_SPEED)
+            elif direction == 'mid':
+                logo.motor_speed(-JOY_SPEED, -JOY_SPEED)
+            elif direction == 'lef':
+                logo.motor_speed(-JOY_SPEED, JOY_SPEED)
+            elif direction == 'rig':
+                logo.motor_speed(JOY_SPEED, -JOY_SPEED)
         return self
 
 
