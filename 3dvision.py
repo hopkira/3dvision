@@ -401,12 +401,13 @@ class Following(State):
             print("avg_indices:", direction)
             angle = (direction - 19.5 ) * h_bucket_fov
             print(angle)
-            if angle != 0.0 and min_dist <= MAX_DIST:
-                logo.rt(angle, fast = True)
-                return
-            dist = min_dist - SWEET_SPOT
-            if abs(angle) < 0.2 and min_dist <= MAX_DIST and dist > 0.05 :
-                logo.fd(dist)
+            if abs(angle) >= 0.1 :
+                if min_dist <= MAX_DIST:
+                    logo.rt(angle, fast = True)
+            else:
+                dist = min_dist - SWEET_SPOT
+                if  min_dist <= MAX_DIST and dist > 0.05 :
+                    logo.fd(dist)
 
     def on_event(self, event):
         if event == 'chefoloff':
