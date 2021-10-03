@@ -346,6 +346,7 @@ class Moving_Forward(State):
         check = k9.scan()
         try:
             min_dist = np.amin(check[17:25])
+            print("moving_forward: min_dis:", str(min_dist))
             if min_dist <= SWEET_SPOT:
                 logo.stop()
                 k9.on_event('person_found')
@@ -591,4 +592,5 @@ except KeyboardInterrupt:
     del device
     k9.client.loop_stop()
     k9.speak("Inactive")
+    print('exiting from', str(k9.state).lower(),'state.')
     sys.exit(0)
