@@ -568,7 +568,7 @@ class K9(object):
                 # Change nan values into large infinite ones
                 closest = np.nan_to_num(closest, nan=4000.0)
                 # Turn into a 1D array
-                closest = closest.flatten
+                closest = closest.flatten()
                 return closest
 
     def callback(self, client, userdata, message):
