@@ -41,9 +41,9 @@ from operator import attrgetter
 ap = argparse.ArgumentParser()
 ap.add_argument("-a", "--max", type=float, default=1.0,
 	help="Maximum distance")
-ap.add_argument("-i", "--min", type=float, default=0.3,
+ap.add_argument("-i", "--min", type=float, default=0.25,
 	help="Minimium distance")
-ap.add_argument("-s", "--safe", type=float, default=0.4,
+ap.add_argument("-s", "--safe", type=float, default=0.5,
 	help="Safe distance")
 ap.add_argument("-c", "--conf", type=float, default=0.90,
 	help="Confidence")
@@ -384,7 +384,7 @@ class Following(State):
     Having reached the target, now follow it blindly
     '''
     def __init__(self):
-        super(Moving_Forward, self).__init__()
+        super(Following, self).__init__()
         k9.speak("Mastah!")
 
     def run(self):
@@ -583,8 +583,10 @@ class K9(object):
                 closest = np.amin(totals, axis = 0 )
                 # Round the to the nearest 10cm
                 closest = np.around(closest)
-                # Change nan values into large infinite ones
+                # Change nan values into 4 m distance
                 closest = np.nan_to_num(closest, nan=4000.0)
+                # Convert distance to m
+                closest = closest/1000.0
                 # Turn into a 1D array
                 closest = closest.flatten()
                 return closest
