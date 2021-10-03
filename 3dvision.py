@@ -334,36 +334,47 @@ class Moving_Forward(State):
 
     def run(self):
         k9.client.loop(0.1)
-        # Wait until move finishes and return to target scanning
-        # or detect that a collision is imminent and stop
+        # If robot is moving, then check for a 
+        # potential collision (or a complete lack of
+        # targets.  If nothiing to worry about then
+        # check for a person in 
+        # the field of view and adjust
+        # if necessary
         if not logo.finished_move():
-            test = k9.person_scan()
+            # check for obstacles
+            check = k9.scan() 
+            if check is not None:
+                min_dist = np.amin(check[17:25]) # narrow to robot width
+                if min_dist == 4000.0:
+                    logo.stop()
+                    k9.on_event('scan_again')
+                if min_dist <= SWEET_SPOT:
+                    logo.stop()
+                    k9.on_event('target_reached')
+            test = k9.person_scan() # check for person
             if test is not None :
                 k9.target = test
-                k9.on_event('new_information')
-        # if the robot is about to hit something
-        # then stop at the sweet spot
-        check = k9.scan()
-        if check is not None:
-            print(check)
-        try:
-            min_dist = np.amin(check[17:25])
-            print("moving_forward: min_dis:", str(min_dist))
-            if min_dist <= SWEET_SPOT:
-                logo.stop()
-                k9.on_event('person_found')
-        except (TypeError,ValueError):
-            pass
+                z = float(k9.target.depth_z)
+                x = float(k9.target.depth_x)
+                angle = ( math.pi / 2 ) - math.atan2(z, x)
+                if abs(angle) > 0.2 :
+                    k9.on_event('new_angle')
+                else:
+                    k9.on_event('new_distance')
 
     def on_event(self, event):
-        if event == 'new_information':
+        if event == 'new_angle':
+            return Turning
+        if event == 'new_distance':
             return Moving_Forward()
         if event == 'chefoloff':
             return Awake()
-        if event == 'person_found':
+        if event == 'target_reached':
             return Following()
         if event == 'k9mrigsta':
             return Joystick()
+        if event == 'scan_again':
+            return Scanning()
         return self
 
 
@@ -379,11 +390,11 @@ class Following(State):
     def run(self):
         k9.client.loop(0.1)
         check = k9.scan()#
-        print(check[17:23])
-        min_dist = np.amin(check[17:23])
-        # determine which indices have min value and average
-        if min_dist == 4000.0 or min_dist < SWEET_SPOT:
-            logo.stop
+        if check is not None:
+            print(check[17:23])
+            min_dist = np.amin(check[17:23])
+            if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
+                logo.stop
         #result = np.where(check == min_dist)
         #direction = np.average(result)
         #angle = (result - 20.0 ) * h_bucket_fov
