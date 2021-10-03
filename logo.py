@@ -225,16 +225,19 @@ def backward(distance):
 
 back = bk = backwards = backward
 
-def left(angle):
+def left(angle, fast = False):
     '''Spins K9 by 'angle' radians
     '''
     global rc
     fraction = angle / ( 2 * math.pi )
     clicks = TURNING_CIRCLE * fraction
     if clicks < 1.0 : clicks = 1.0
-    turn_modifier = calc_turn_modifier(radius = 0)
-    click_vel = calc_click_vel(clicks=clicks, turn_mod=turn_modifier)
-    accel = int(abs(click_vel * click_vel / ( 2.0 * clicks / 2.0)))
+    if not fast:
+        turn_modifier = calc_turn_modifier(radius = 0)
+        click_vel = calc_click_vel(clicks=clicks, turn_mod=turn_modifier)
+        accel = int(abs(click_vel * click_vel / ( 2.0 * clicks / 2.0)))
+    else:
+        accel = ACCELERATION
     if not sim:
         rc.SpeedAccelDistanceM1M2(address=rc_address,
                                   accel=accel,

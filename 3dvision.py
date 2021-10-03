@@ -406,7 +406,7 @@ class Following(State):
             angle = (direction - 19.5 ) * h_bucket_fov
             print(angle)
             if angle != 0.0:
-                logo.rt(angle)
+                logo.rt(angle, fast=True)
         #if logo.finished_move() and (min_dist > SWEET_SPOT):
         #    logo.fd(min_dist - SWEET_SPOT)
 
