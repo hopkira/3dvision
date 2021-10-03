@@ -39,13 +39,11 @@ from operator import attrgetter
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-a", "--max", type=float, default=0.8,
+ap.add_argument("-a", "--max", type=float, default = 1.0,
 	help="Maximum distance")
-ap.add_argument("-i", "--min", type=float, default=0.0,
+ap.add_argument("-i", "--min", type=float, default = 0.50,
 	help="Minimium distance")
-ap.add_argument("-s", "--safe", type=float, default=0.5,
-	help="Safe distance")
-ap.add_argument("-c", "--conf", type=float, default=0.90,
+ap.add_argument("-c", "--conf", type=float, default = 0.90,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
@@ -57,9 +55,7 @@ args = vars(ap.parse_args())
 MAX_DIST = args['max']
 MIN_DIST = args['min']
 CONF = args['conf']
-SAFETY_MARGIN = args['safe']
-S_SPOT_BUFFR = (MAX_DIST - MIN_DIST - SAFETY_MARGIN) / 2.0
-SWEET_SPOT = S_SPOT_BUFFR + MIN_DIST + SAFETY_MARGIN
+SWEET_SPOT = MIN_DIST + (MAX_DIST - MIN_DIST) / 2.0
 
 print("Sweet spot is",SWEET_SPOT,"meters from robot")
 
@@ -407,12 +403,10 @@ class Following(State):
             print(angle)
             if angle != 0.0 and min_dist <= MAX_DIST:
                 logo.rt(angle, fast = True)
-            if abs(angle) < 0.2 and min_dist <= MAX_DIST and min_dist > SWEET_SPOT:
-                dist = min_dist - SWEET_SPOT
-                if abs(dist) > 0.002 :
-                    logo.fd(min_dist - SWEET_SPOT)
-        #if logo.finished_move() and (min_dist > SWEET_SPOT):
-        #    logo.fd(min_dist - SWEET_SPOT)
+                return
+            dist = min_dist - SWEET_SPOT
+            if abs(angle) < 0.2 and min_dist <= MAX_DIST and dist > 0.05 :
+                logo.fd(dist)
 
     def on_event(self, event):
         if event == 'chefoloff':
