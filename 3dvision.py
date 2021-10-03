@@ -345,9 +345,6 @@ class Moving_Forward(State):
             check = k9.scan() 
             if check is not None:
                 min_dist = np.amin(check[17:25]) # narrow to robot width
-                if min_dist == 4000.0:
-                    logo.stop()
-                    k9.on_event('scan_again')
                 if min_dist <= SWEET_SPOT:
                     logo.stop()
                     k9.on_event('target_reached')
