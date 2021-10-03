@@ -466,7 +466,7 @@ class K9(object):
         '''
 
         # The next state will be the result of the on_event function.
-        print(event, "raised in state", str(self.state))
+        print(event, "raised in state", str(self.state).lower())
         self.state = self.state.on_event(event)
 
     def speak(self,speech):
@@ -476,7 +476,7 @@ class K9(object):
         to make the voice more John Leeson like
         '''
         
-        print('Speech:', speech)
+        print('speech:', speech)
         self.speaking = None
         clauses = speech.split("|")
         for clause in clauses:
