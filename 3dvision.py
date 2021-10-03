@@ -325,7 +325,7 @@ class Moving_Forward(State):
     The child state where K9 is moving forwards to the target
     '''
     def __init__(self):
-        avg_dist = 4.0
+        self.avg_dist = 4.0
         super(Moving_Forward, self).__init__()
         z = float(k9.target.depth_z)
         distance = float(z - SWEET_SPOT)
@@ -347,14 +347,14 @@ class Moving_Forward(State):
             if check is not None:
                 min_dist = np.amin(check[17:25]) # narrow to robot width
                 print("Min dist:", min_dist)
-                avg_dist = (avg_dist + min_dist)/2
-                if avg_dist <= SWEET_SPOT:
+                self.avg_dist = (self.avg_dist + min_dist) / 2.0
+                if self.avg_dist <= SWEET_SPOT:
                     logo.stop()
                     k9.on_event('target_reached')
             person_seen = k9.person_scan() # check for person
             if person_seen is not None :
                 k9.target = person_seen
-                avg_dist = k9.target.depth_z
+                self.avg_dist = k9.target.depth_z
                 z = float(k9.target.depth_z)
                 x = float(k9.target.depth_x)
                 angle = ( math.pi / 2 ) - math.atan2(z, x)
