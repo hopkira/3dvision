@@ -155,7 +155,7 @@ class State(object):
     '''
 
     def __init__(self):
-        print('Entering',str(self).lower(),' state.')
+        print('entering',str(self).lower(),'state.')
 
     def on_event(self, event):
         '''
@@ -336,18 +336,17 @@ class Moving_Forward(State):
         k9.client.loop(0.1)
         # Wait until move finishes and return to target scanning
         # or detect that a collision is imminent and stop
-        if logo.finished_move():
-            k9.on_event('move_finished')
-        test = k9.person_scan()
-        if test is not None :
-            k9.target = test
-            k9.on_event('new_information')
+        if not logo.finished_move():
+            test = k9.person_scan()
+            if test is not None :
+                k9.target = test
+                k9.on_event('new_information')
         # if the robot is about to hit something
         # then stop at the sweet spot
         check = k9.scan()
         try:
             min_dist = np.amin(check[17:25])
-            if min_dist < SWEET_SPOT:
+            if min_dist <= SWEET_SPOT:
                 logo.stop()
                 k9.on_event('person_found')
         except (TypeError,ValueError):
@@ -358,8 +357,6 @@ class Moving_Forward(State):
             return Moving_Forward()
         if event == 'chefoloff':
             return Awake()
-        if event == 'move_finished': 
-            return Scanning()
         if event == 'person_found':
             return Following()
         if event == 'k9mrigsta':
