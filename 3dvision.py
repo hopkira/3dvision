@@ -300,16 +300,16 @@ class Turning(State):
     def run(self):
         k9.client.loop(0.1)
         # Checks to see if motors have stopped
-        test = k9.person_scan()
-        if test is not None :
-            k9.target = test
-            k9.on_event('new_information')
+        #test = k9.person_scan()
+        #if test is not None :
+        #    k9.target = test
+        #    k9.on_event('new_information')
         if logo.finished_move():
             k9.on_event('turn_finished')
 
     def on_event(self, event):
-        if event == 'new_information':
-            return Turning()
+        #if event == 'new_information':
+        #    return Turning()
         if event == 'chefoloff':
             return Awake()
         if event == 'turn_finished':
@@ -351,25 +351,25 @@ class Moving_Forward(State):
                 if self.avg_dist <= SWEET_SPOT:
                     logo.stop()
                     k9.on_event('target_reached')
-            person_seen = k9.person_scan() # check for person
-            if person_seen is not None :
-                k9.target = person_seen
-                self.avg_dist = k9.target.depth_z
-                z = float(k9.target.depth_z)
-                x = float(k9.target.depth_x)
-                angle = ( math.pi / 2 ) - math.atan2(z, x)
-                if abs(angle) > 0.2 :
-                    k9.on_event('new_angle')
-                else:
-                    k9.on_event('new_distance')
+            #person_seen = k9.person_scan() # check for person
+            #if person_seen is not None :
+            #    k9.target = person_seen
+            #    self.avg_dist = k9.target.depth_z
+            #    z = float(k9.target.depth_z)
+            #    x = float(k9.target.depth_x)
+            #    angle = ( math.pi / 2 ) - math.atan2(z, x)
+            #    if abs(angle) > 0.2 :
+            #        k9.on_event('new_angle')
+            #    else:
+            #        k9.on_event('new_distance')
         else:
             k9.on_event('target_reached')
 
     def on_event(self, event):
-        if event == 'new_angle':
-            return Turning()
-        if event == 'new_distance':
-            return Moving_Forward()
+        #if event == 'new_angle':
+        #    return Turning()
+        #if event == 'new_distance':
+        #    return Moving_Forward()
         if event == 'chefoloff':
             return Awake()
         if event == 'target_reached':
