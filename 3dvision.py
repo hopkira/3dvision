@@ -66,8 +66,8 @@ print("Sweet spot is",SWEET_SPOT,"meters from robot")
 SPEED_DEFAULT = 150
 SPEED_DOWN = 125
 AMP_UP = 200
-AMP_DEFAULT = 190
-AMP_DOWN = 180
+AMP_DEFAULT = 100
+AMP_DOWN = 50
 PITCH_DEFAULT = 99
 PITCH_DOWN = 89
 SOX_VOL_UP = 25
@@ -259,8 +259,7 @@ class Scanning(State):
 
     def __init__(self):
         super(Scanning, self).__init__()
-        print('Waiting for the closest person to be detected...')
-        # k9.speak("Finding person to follow")
+        k9.speak("Scanning")
         global started_scan
         k9.started_scan = time.time()
 
@@ -376,6 +375,7 @@ class Following(State):
     '''
     def __init__(self):
         super(Moving_Forward, self).__init__()
+        k9.speak("Mastah!")
 
     def run(self):
         k9.client.loop(0.1)
@@ -405,11 +405,12 @@ class Following(State):
 class Joystick(State):
 
     '''
-    Having reached the target, now follow it blindly
+    Receive manual movement commands from watch
     '''
     def __init__(self):
         super(Joystick, self).__init__()
         logo.stop()
+        k9.speak("Under manual control")
 
     def run(self):
         k9.client.loop(0.1)
@@ -476,7 +477,7 @@ class K9(object):
         to make the voice more John Leeson like
         '''
         
-        print(speech)
+        print('Speech:', speech)
         clauses = speech.split("|")
         for clause in clauses:
             if clause and not clause.isspace():
@@ -563,7 +564,7 @@ class K9(object):
         if payload != self.last_message:
             self.last_message = payload
             event = payload[3:-1].lower()
-            print("Event: ",str(event))
+            # print("Event: ",str(event))
             self.on_event(event)
 
 # Create the k9 finite state machine
