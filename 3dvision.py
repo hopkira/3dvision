@@ -388,6 +388,7 @@ class Following(State):
     '''
     def __init__(self):
         super(Following, self).__init__()
+        logo.stop()
         k9.speak("Mastah!")
 
     def run(self):
@@ -398,11 +399,13 @@ class Following(State):
             if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
                 logo.stop
             result = np.where(check == min_dist)
+            print("min dist:", result)
             direction = np.average(result)
+            print("direction:", direction)
             angle = (direction - 20.0 ) * h_bucket_fov
             print(angle)
             if logo.finished_move() and abs(angle > 0.2) :
-                logo.rt("angle:", angle)
+                logo.rt(angle)
         #if logo.finished_move() and (min_dist > SWEET_SPOT):
         #    logo.fd(min_dist - SWEET_SPOT)
 
