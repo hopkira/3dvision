@@ -257,10 +257,10 @@ def left(angle, fast = False):
 
 lt = left
 
-def right(angle):
+def right(angle, fast=False):
     '''Moves K9 right by 'angle' radians
     '''
-    left(-1*angle)
+    left( -1 * angle, fast = fast)
 
 rt = right
 
