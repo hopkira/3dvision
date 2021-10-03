@@ -392,10 +392,10 @@ class Following(State):
         k9.speak("Mastah!")
 
     def run(self):
-        k9.client.loop(0.1)
+        #k9.client.loop(0.1)
         check = k9.scan()
         if check is not None:
-            min_dist = np.amin(check[10:30])
+            min_dist = np.amin(check[5:35])
             if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
                 logo.stop
             result = np.where(check == min_dist)
@@ -405,7 +405,8 @@ class Following(State):
             print("avg_indices:", direction)
             angle = (direction - 19.5 ) * h_bucket_fov
             print(angle)
-            logo.rt(angle)
+            if angle != 0.0:
+                logo.rt(angle)
         #if logo.finished_move() and (min_dist > SWEET_SPOT):
         #    logo.fd(min_dist - SWEET_SPOT)
 
