@@ -44,7 +44,7 @@ ap.add_argument("-i", "--min", type=float, default=0.3,
 	help="Minimium distance")
 ap.add_argument("-s", "--safe", type=float, default=0.2,
 	help="Safe distance")
-ap.add_argument("-c", "--conf", type=float, default=0.9,
+ap.add_argument("-c", "--conf", type=float, default=0.95,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
@@ -65,9 +65,9 @@ print("Sweet spot is",SWEET_SPOT,"meters from robot")
 # These values control K9s voice
 SPEED_DEFAULT = 150
 SPEED_DOWN = 125
-AMP_UP = 200
-AMP_DEFAULT = 100
-AMP_DOWN = 50
+AMP_UP = 100
+AMP_DEFAULT = 50
+AMP_DOWN = 25
 PITCH_DEFAULT = 99
 PITCH_DOWN = 89
 SOX_VOL_UP = 25
@@ -261,7 +261,7 @@ class Scanning(State):
         super(Scanning, self).__init__()
         k9.speak("Scanning")
         global started_scan
-        k9.started_scan = time.time()
+        #k9.started_scan = time.time()
 
     def run(self):
         k9.target = None
@@ -270,20 +270,11 @@ class Scanning(State):
         # if detection.depth_z > MIN_DIST
         # if detection.depth_z < MAX_DIST
         k9.client.loop(0.1)
-        if (time.time() - k9.started_scan) > 10.0 and logo.finished_move():
-            logo.lt(0.524)
-        nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
-        for nnet_packet in nnet_packets:
-            detections = list(nnet_packet.getDetectedObjects())
-            if detections is not None:
-                people = [detection for detection in detections
-                            if detection.label == 15
-                            if detection.confidence > CONF]
-                if len(people) >= 1 :
-                    k9.target = min(people, key=attrgetter('depth_z'))
-                    k9.on_event('person_found')
-        #if k9.target is None and not logo.finished_move():
-        #    logo.stop()
+        #if (time.time() - k9.started_scan) > 10.0 and logo.finished_move():
+        #    logo.lt(0.524)
+        k9.target = k9.person_scan()
+        if k9.target is not None :
+            k9.on_event('person_found')
 
     def on_event(self, event):
         if event == 'person_found':
@@ -314,10 +305,16 @@ class Turning(State):
     def run(self):
         k9.client.loop(0.1)
         # Checks to see if motors have stopped
+        test = k9.person_scan()
+        if test is not None :
+            k9.target = k9.test
+            k9.on_event('new_information')
         if logo.finished_move():
             k9.on_event('turn_finished')
 
     def on_event(self, event):
+        if event == 'new_information':
+            return Turning()
         if event == 'chefoloff':
             return Awake()
         if event == 'turn_finished':
@@ -504,6 +501,20 @@ class K9(object):
                 cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z" % (clause, pitch, speed, amplitude)
                 os.system(cmd)
 
+    def person_scan(self):
+        '''
+        Returns nearest identified person
+        '''
+        nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
+        for nnet_packet in nnet_packets:
+            detections = list(nnet_packet.getDetectedObjects())
+            if detections is not None:
+                people = [detection for detection in detections
+                            if detection.label == 15
+                            if detection.confidence > CONF]
+                if len(people) >= 1 :
+                    return min(people, key=attrgetter('depth_z'))
+
     def scan(self):
         '''
         Retrieve a 40 element array derived from the 3D camera
@@ -574,8 +585,9 @@ try:
     while True:
         k9.run()
 except KeyboardInterrupt:
-    print("K9 halted by CTRL+C")
+    logo.stop()
     del body_cam
     del device
     k9.client.loop_stop()
+    k9.speak("Inactive")
     sys.exit(0)
