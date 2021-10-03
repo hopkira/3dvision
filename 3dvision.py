@@ -344,6 +344,7 @@ class Moving_Forward(State):
         # if the robot is about to hit something
         # then stop at the sweet spot
         check = k9.scan()
+        print("scan type:",type(check))
         try:
             min_dist = np.amin(check[17:25])
             print("moving_forward: min_dis:", str(min_dist))
