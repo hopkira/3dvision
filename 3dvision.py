@@ -346,8 +346,6 @@ class Moving_Forward(State):
         check = k9.scan()
         if check is not None:
             print(check)
-            print(check.shape)
-            print(check.dtype)
         try:
             min_dist = np.amin(check[17:25])
             print("moving_forward: min_dis:", str(min_dist))
