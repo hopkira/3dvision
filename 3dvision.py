@@ -378,20 +378,19 @@ class Following(State):
 
     def run(self):
         k9.client.loop(0.1)
-        check = k9.scan()
-        try:
-            # calculate the minimum distance to person
-            min_dist = np.amin(check)
-            # determine which indices have min value and average
-            result = np.where(check == min_dist)
-            direction = np.average(result)
-            angle = (result - 20.0 ) * h_bucket_fov
-            if logo.finished_move() and abs(angle > 0.2) :
-                logo.rt(angle)
-            if logo.finished_move() and (min_dist > SWEET_SPOT):
-                logo.fd(min_dist - SWEET_SPOT)
-        except (TypeError,ValueError):
-            pass
+        check = k9.scan()#
+        print(check[17:23])
+        min_dist = np.amin(check[17:23])
+        # determine which indices have min value and average
+        if min_dist == 4000.0 or min_dist < SWEET_SPOT:
+            logo.stop
+        #result = np.where(check == min_dist)
+        #direction = np.average(result)
+        #angle = (result - 20.0 ) * h_bucket_fov
+        #if logo.finished_move() and abs(angle > 0.2) :
+        #    logo.rt(angle)
+        #if logo.finished_move() and (min_dist > SWEET_SPOT):
+        #    logo.fd(min_dist - SWEET_SPOT)
 
     def on_event(self, event):
         if event == 'chefoloff':
@@ -451,7 +450,7 @@ class K9(object):
         self.last_message = ""
         self.client = mqtt.Client("k9-python")
         self.client.connect("localhost")
-        self.client.on_message = self.callback        # attach function to callback
+        self.client.on_message = self.mqtt_callback        # attach function to callback
         self.client.subscribe("/ble/advertise/watch/m")
 
     def run(self):
@@ -571,7 +570,7 @@ class K9(object):
                 closest = closest.flatten()
                 return closest
 
-    def callback(self, client, userdata, message):
+    def mqtt_callback(self, client, userdata, message):
         """
         Enables K9 to receive a message from an Epruino Watch via
         MQTT over Bluetooth (BLE) to place it into active or inactive States
