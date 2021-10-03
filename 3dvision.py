@@ -395,7 +395,7 @@ class Following(State):
         #k9.client.loop(0.1)
         check = k9.scan()
         if check is not None:
-            min_dist = np.amin(check[5:35])
+            min_dist = np.amin(check) # was [5:35]
             if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
                 logo.stop
             result = np.where(check == min_dist)
