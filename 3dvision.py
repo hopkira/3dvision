@@ -147,7 +147,7 @@ x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
 y_bins = pd.interval_range(start = 0, end = 800, periods = 8)
 
 # calculate the horizontal angle per bucket
-h_bucket_fov = 71.0 / 360.0 * 2.0 * math.pi / 40.0
+h_bucket_fov = math.radians( 71.0 / 40.0)
 
 class State(object):
     '''
@@ -399,10 +399,11 @@ class Following(State):
             if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
                 logo.stop
             result = np.where(check == min_dist)
-            print("min dist:", result)
+            print("min dis:", min_dist)
+            print("indices:", result)
             direction = np.average(result)
-            print("direction:", direction)
-            angle = (direction - 20.0 ) * h_bucket_fov
+            print("avg_indices:", direction)
+            angle = (direction - 19.5 ) * h_bucket_fov
             print(angle)
             if logo.finished_move() and abs(angle > 0.2) :
                 logo.rt(angle)
