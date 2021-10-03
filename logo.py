@@ -231,6 +231,7 @@ def left(angle):
     global rc
     fraction = angle / ( 2 * math.pi )
     clicks = TURNING_CIRCLE * fraction
+    if clicks < 1.0 : clicks = 1.0
     turn_modifier = calc_turn_modifier(radius = 0)
     click_vel = calc_click_vel(clicks=clicks, turn_mod=turn_modifier)
     accel = int(abs(click_vel * click_vel / ( 2.0 * clicks / 2.0)))
