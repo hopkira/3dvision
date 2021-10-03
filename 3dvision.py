@@ -39,7 +39,7 @@ from operator import attrgetter
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-a", "--max", type=float, default=1.0,
+ap.add_argument("-a", "--max", type=float, default=0.8,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default=0.25,
 	help="Minimium distance")
