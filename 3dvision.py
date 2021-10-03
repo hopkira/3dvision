@@ -155,7 +155,7 @@ class State(object):
     '''
 
     def __init__(self):
-        print('Entering state:', str(self))
+        print('Entering',str(self).lower(),' state.')
 
     def on_event(self, event):
         '''
@@ -266,13 +266,7 @@ class Scanning(State):
 
     def run(self):
         k9.target = None
-        # Checks for the nearest person in the field of vision
-        # Just removed the following from people = 
-        # if detection.depth_z > MIN_DIST
-        # if detection.depth_z < MAX_DIST
         k9.client.loop(0.1)
-        #if (time.time() - k9.started_scan) > 10.0 and logo.finished_move():
-        #    logo.lt(0.524)
         k9.target = k9.person_scan()
         if k9.target is not None :
             k9.on_event('person_found')
@@ -435,9 +429,9 @@ class Joystick(State):
             elif direction == 'mid':
                 logo.motor_speed(-JOY_SPEED, -JOY_SPEED)
             elif direction == 'lef':
-                logo.motor_speed(-JOY_SPEED/4, JOY_SPEED/4)
+                logo.motor_speed(-JOY_SPEED / 4, JOY_SPEED / 4)
             elif direction == 'rig':
-                logo.motor_speed(JOY_SPEED/4, -JOY_SPEED/4)
+                logo.motor_speed(JOY_SPEED / 4, -JOY_SPEED / 4)
         return self
 
 
