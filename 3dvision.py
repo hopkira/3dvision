@@ -44,7 +44,7 @@ ap.add_argument("-i", "--min", type=float, default=0.3,
 	help="Minimium distance")
 ap.add_argument("-s", "--safe", type=float, default=0.2,
 	help="Safe distance")
-ap.add_argument("-c", "--conf", type=float, default=0.97,
+ap.add_argument("-c", "--conf", type=float, default=0.90,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
@@ -343,7 +343,6 @@ class Moving_Forward(State):
         # or detect that a collision is imminent and stop
         if logo.finished_move():
             k9.on_event('move_finished')
-
         test = k9.person_scan()
         if test is not None :
             k9.target = test
