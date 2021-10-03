@@ -570,7 +570,7 @@ class K9(object):
                 # Turn into a 1D array
                 closest = closest.reshape(1,-1)
                 # Change nan values into large infinite ones
-                closest = closest.nan_to_num(np.inf)
+                closest = np.nan_to_num(closest, np.inf)
                 return closest
 
     def callback(self, client, userdata, message):
