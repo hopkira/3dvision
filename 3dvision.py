@@ -359,6 +359,8 @@ class Moving_Forward(State):
                     k9.on_event('new_angle')
                 else:
                     k9.on_event('new_distance')
+        else:
+            k9.on_event('target_reached')
 
     def on_event(self, event):
         if event == 'new_angle':
@@ -515,7 +517,7 @@ class K9(object):
 
     def person_scan(self):
         '''
-        Returns nearest identified person
+        Returns detectd person nearest centre of field
         '''
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for nnet_packet in nnet_packets:
@@ -525,7 +527,11 @@ class K9(object):
                             if detection.label == 15
                             if detection.confidence > CONF]
                 if len(people) >= 1 :
-                    return min(people, key=attrgetter('depth_z'))
+                    for person in people:
+                        z = float(person.depth_z)
+                        x = float(person.depth_x)
+                        person.angle = abs(( math.pi / 2 ) - math.atan2(z, x))
+                    return min(people, key=attrgetter('angle'))
 
     def scan(self):
         '''
