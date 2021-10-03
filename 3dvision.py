@@ -508,7 +508,7 @@ class K9(object):
                     sox_vol = SOX_VOL_DEFAULT
                     sox_pitch = SOX_PITCH_DEFAULT
                 #cmd = "espeak -v en-rp '%s' -p %s -s %s -a %s -z" % (clause, pitch, speed, amplitude)
-                cmd = ['espeak','-v','en-rp',clause,'-p',pitch,'-s',speed,'-a',amplitude]
+                cmd = ['espeak','-v','en-rp',str(clause),'-p',str(pitch),'-s',str(speed),'-a',str(amplitude)]
                 self.speaking = Popen(cmd)
 
     def person_scan(self):
