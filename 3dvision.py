@@ -542,6 +542,7 @@ class K9(object):
                 # Resize the array if necessary by selecting asked
                 # for rows
                 totals = array[top_row:bottom_row,:]
+                print(totals)
                 # Determine the nearest segment for each of the 40
                 # horizontal segments
                 closest = np.amin(totals, axis = 0 )
@@ -602,7 +603,6 @@ class K9(object):
                 totals = binned_depths.groupby([y_index, x_index]).mean()
                 # Reshape the bins into a 16 x 40 matrix
                 totals = totals.values.reshape(16,40)
-                print(totals)
                 closest = self.find_closest(totals, top_row = top_row, bottom_row = bottom_row)
                 return closest
 
