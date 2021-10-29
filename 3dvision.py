@@ -542,7 +542,6 @@ class K9(object):
                 # Resize the array if necessary by selecting asked
                 # for rows
                 totals = array[top_row:bottom_row,:]
-                print(totals)
                 # Determine the nearest segment for each of the 40
                 # horizontal segments
                 # Change nan values into 4 m distance
