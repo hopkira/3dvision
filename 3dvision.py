@@ -386,9 +386,10 @@ class Following(State):
         if check is not None:
             print(check)
             min_dist = np.amin(check) # was [5:35]
-            if min_dist == MAX_RANGE or min_dist <= SWEET_SPOT:
+            if min_dist == MAX_RANGE or min_dist <= MIN_DIST:
                 logo.stop
-            result = np.where((check <= MAX_DIST) & (check >= MIN_DIST))
+            # result = np.where((check <= MAX_DIST) & (check >= MIN_DIST))
+            result = np.where(check == min_dist)
             print("min dist:", min_dist)
             print("indices:", result)
             if len(result[0]) > 0 :
@@ -543,7 +544,7 @@ class K9(object):
                 # for rows
                 totals = array[top_row:bottom_row,:]
                 # Determine the nearest segment for each of the 40
-                # horizontal segments
+                # vertical segments
                 # Change nan values into 4 m distance
                 closest = np.nan_to_num(totals, nan = MAX_RANGE)
                 closest = np.amin(closest, axis = 0 )
