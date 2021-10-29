@@ -389,7 +389,7 @@ class Following(State):
             min_dist = np.amin(check) # was [5:35]
             if min_dist == MAX_RANGE or min_dist <= SWEET_SPOT:
                 logo.stop
-            result = np.where((check <= MAX_DIST) | (check >= MIN_DIST))
+            result = np.where((check <= MAX_DIST) & (check >= MIN_DIST))
             print("min dist:", min_dist)
             print("indices:", result)
             direction = np.average(result)
