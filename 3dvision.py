@@ -382,7 +382,7 @@ class Following(State):
 
     def run(self):
         # scan for things taller than 60 cm
-        check = k9.scan(top_row = 0, bottom_row = 10)
+        check = k9.scan(top_row = 0, bottom_row = 16) # full scan
         if check is not None:
             min_dist = np.amin(check) # was [5:35]
             if min_dist == MAX_RANGE or min_dist <= SWEET_SPOT:
