@@ -23,8 +23,6 @@ K9 was created by Bob Baker and David Martin
 """
 import argparse
 import sys
-import time
-import os
 import json
 import math
 import depthai
@@ -34,7 +32,6 @@ import skimage.measure as skim
 import paho.mqtt.client as mqtt
 import logo # K9 movement library
 from subprocess import Popen
-from operator import attrgetter
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -77,7 +74,6 @@ JOY_SPEED = 0.03
 
 detections = []
 angle = 0.0
-last_seen = 0.05
 
 disparity_confidence_threshold = 130
 
@@ -122,12 +118,8 @@ def nn_to_depth_coord(x, y, nn2depth):
     y_depth = int(nn2depth['off_y'] + y * nn2depth['max_h'])
     return x_depth, y_depth
 
-detections = []
-angle = 0.0
-last_seen = 0.05
-
 decimate = 20
-max_dist = 4000.0
+MAX_RANGE = 4000.0
 height = 400.0
 width = 640.0
 cx = width/decimate/2
@@ -395,7 +387,7 @@ class Following(State):
         check = k9.scan(top_row = 0, bottom_row = 10)
         if check is not None:
             min_dist = np.amin(check) # was [5:35]
-            if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
+            if min_dist == MAX_RANGE or min_dist <= SWEET_SPOT:
                 logo.stop
             result = np.where((check <= MAX_DIST) | (check >= MIN_DIST))
             print("min dist:", min_dist)
@@ -556,7 +548,7 @@ class K9(object):
                 # Round the to the nearest 10cm
                 closest = np.around(closest)
                 # Change nan values into 4 m distance
-                closest = np.nan_to_num(closest, nan=4000.0)
+                closest = np.nan_to_num(closest, nan = MAX_RANGE)
                 # Convert distance to m
                 closest = closest/1000.0
                 # Turn into a 1D array
@@ -584,10 +576,10 @@ class K9(object):
                 height, width = frame.shape
                 # Convert depth map to point cloud with valid depths
                 column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
-                valid = (frame > 200) & (frame < max_dist)
+                valid = (frame > 200) & (frame < MAX_RANGE)
                 z = np.where(valid, frame, 0)
-                x = np.where(valid, (z * (column - cx) /cx / fx) + 120 , max_dist)
-                y = np.where(valid, 325 - (z * (row - cy) / cy / fy) , max_dist)
+                x = np.where(valid, (z * (column - cx) /cx / fx) + 120 , MAX_RANGE)
+                y = np.where(valid, 325 - (z * (row - cy) / cy / fy) , MAX_RANGE)
                 # Flatten point cloud axes
                 z2 = z.flatten()
                 x2 = x.flatten()
