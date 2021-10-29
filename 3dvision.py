@@ -340,8 +340,6 @@ class Moving_Forward(State):
                 if self.avg_dist <= SWEET_SPOT:
                     logo.stop()
                     k9.on_event('target_reached')
-                else:
-                    logo.forward(self.avg_dist)
             #person_seen = k9.person_scan() # check for person
             #if person_seen is not None :
             #    k9.target = person_seen
