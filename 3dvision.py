@@ -548,7 +548,7 @@ class K9(object):
                 # Change nan values into 4 m distance
                 closest = np.nan_to_num(totals, nan = MAX_RANGE)
                 print("1",closest)
-                closest = np.amin(totals, axis = 0 )
+                closest = np.amin(closest, axis = 0 )
                 print("2",closest)
                 # Round the to the nearest 10cm
                 closest = np.around(closest)
