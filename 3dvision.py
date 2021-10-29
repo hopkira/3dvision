@@ -545,13 +545,13 @@ class K9(object):
                 print(totals)
                 # Determine the nearest segment for each of the 40
                 # horizontal segments
-                closest = np.amin(totals, axis = 0 )
+                # Change nan values into 4 m distance
+                closest = np.nan_to_num(totals, nan = MAX_RANGE)
                 print("1",closest)
+                closest = np.amin(totals, axis = 0 )
+                print("2",closest)
                 # Round the to the nearest 10cm
                 closest = np.around(closest)
-                print("2",closest)
-                # Change nan values into 4 m distance
-                closest = np.nan_to_num(closest, nan = MAX_RANGE)
                 print("3",closest)
                 # Convert distance to m
                 closest = closest/1000.0
