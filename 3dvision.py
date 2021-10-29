@@ -390,7 +390,7 @@ class Following(State):
             result = np.where((check <= MAX_DIST) & (check >= MIN_DIST))
             print("min dist:", min_dist)
             print("indices:", result)
-            if result is not None:
+            if result.size > 0:
                 direction = np.average(result)
                 print("avg_indices:", direction)
                 angle = (direction - 19.5 ) * h_bucket_fov
