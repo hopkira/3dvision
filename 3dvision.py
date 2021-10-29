@@ -390,17 +390,18 @@ class Following(State):
             result = np.where((check <= MAX_DIST) & (check >= MIN_DIST))
             print("min dist:", min_dist)
             print("indices:", result)
-            direction = np.average(result)
-            print("avg_indices:", direction)
-            angle = (direction - 19.5 ) * h_bucket_fov
-            print(angle)
-            if abs(angle) >= 0.1 :
-                if min_dist <= MAX_DIST:
-                    logo.rt(angle, fast = True)
-            else:
-                dist = min_dist - SWEET_SPOT
-                if  min_dist <= MAX_DIST and dist > 0.05 :
-                    logo.fd(dist)
+            if result:
+                direction = np.average(result)
+                print("avg_indices:", direction)
+                angle = (direction - 19.5 ) * h_bucket_fov
+                print(angle)
+                if abs(angle) >= 0.1 :
+                    if min_dist <= MAX_DIST:
+                        logo.rt(angle, fast = True)
+                else:
+                    dist = min_dist - SWEET_SPOT
+                    if  min_dist <= MAX_DIST and dist > 0.05 :
+                        logo.fd(dist)
 
     def on_event(self, event):
         if event == 'chefoloff':
