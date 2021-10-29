@@ -576,10 +576,10 @@ class K9(object):
                 height, width = frame.shape
                 # Convert depth map to point cloud with valid depths
                 column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
-                valid = (frame > 200) & (frame < MAX_RANGE)
-                z = np.where(valid, frame, 0)
-                x = np.where(valid, (z * (column - cx) /cx / fx) + 120 , MAX_RANGE)
-                y = np.where(valid, 325 - (z * (row - cy) / cy / fy) , MAX_RANGE)
+                valid = (frame > 200.0) & (frame < MAX_RANGE)
+                z = np.where(valid, frame, 0.0)
+                x = np.where(valid, (z * (column - cx) /cx / fx) + 120.0 , MAX_RANGE)
+                y = np.where(valid, 325.0 - (z * (row - cy) / cy / fy) , MAX_RANGE)
                 # Flatten point cloud axes
                 z2 = z.flatten()
                 x2 = x.flatten()
@@ -587,7 +587,7 @@ class K9(object):
                 # Stack the x, y and z co-ordinates into a single 2D array
                 cloud = np.column_stack((x2,y2,z2))
                 # Filter the array by x and y co-ordinates
-                in_scope = (cloud[:,1]<1600) & (cloud[:,1] > 0) & (cloud[:,0]<2000) & (cloud[:,0] > -2000)
+                in_scope = (cloud[:,1] < 1600) & (cloud[:,1] > 0) & (cloud[:,0] < 2000) & (cloud[:,0] > -2000)
                 in_scope = np.repeat(in_scope, 3)
                 in_scope = in_scope.reshape(-1, 3)
                 scope = np.where(in_scope, cloud, np.nan)
@@ -602,6 +602,7 @@ class K9(object):
                 totals = binned_depths.groupby([y_index, x_index]).mean()
                 # Reshape the bins into a 16 x 40 matrix
                 totals = totals.values.reshape(16,40)
+                print(totals)
                 closest = self.find_closest(totals, top_row = top_row, bottom_row = bottom_row)
                 return closest
 
