@@ -547,18 +547,11 @@ class K9(object):
                 # horizontal segments
                 # Change nan values into 4 m distance
                 closest = np.nan_to_num(totals, nan = MAX_RANGE)
-                print("1",closest)
                 closest = np.amin(closest, axis = 0 )
-                print("2",closest)
-                # Round the to the nearest 10cm
-                closest = np.around(closest)
-                print("3",closest)
                 # Convert distance to m
                 closest = closest/1000.0
-                print("4",closest)
                 # Turn into a 1D array
                 closest = closest.flatten()
-                print("5",closest)
                 return closest
 
     def scan(self, top_row = 8, bottom_row = 16):
