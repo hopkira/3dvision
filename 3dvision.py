@@ -7,12 +7,11 @@
 Args:
     -a, --max (float): Maximum distance to follow
     -i, --min (float): Minimum distance to follow
-    -s, --safe (float): Addiitional safety margin
     -c, --conf (float): Confidence level
-    -x, --exec (bool):  Start in active mode
+    --active :  Start in active mode
 
 Example:
-    $ python3 3dvision.py -a 2.0 -i 0.2 -s 0.1 -c 0.75 --active
+    $ python3 3dvision.py -a 2.0 -i 0.2 -c 0.75 --active
 
 Todo:
     * stuff
@@ -140,7 +139,7 @@ prev_frame = 0
 now_frame = 0
 
 x_bins = pd.interval_range(start = -2000, end = 2000, periods = 40)
-y_bins = pd.interval_range(start = 0, end = 800, periods = 8)
+y_bins = pd.interval_range(start = 0, end = 1600, periods = 16)
 
 # calculate the horizontal angle per bucket
 h_bucket_fov = math.radians( 71.0 / 40.0)
@@ -177,6 +176,7 @@ class State(object):
         Returns the name of the State.
         '''
         return self.__class__.__name__
+
 
 # Declare the basic K9 operational states
 class Initializing(State):
@@ -343,10 +343,13 @@ class Moving_Forward(State):
             if check is not None:
                 min_dist = np.amin(check[17:25]) # narrow to robot width
                 print("Min dist:", min_dist)
+                # determine rolling average of distance to target
                 self.avg_dist = (self.avg_dist + min_dist) / 2.0
                 if self.avg_dist <= SWEET_SPOT:
                     logo.stop()
                     k9.on_event('target_reached')
+                else:
+                    logo.forward(self.avg_dist)
             #person_seen = k9.person_scan() # check for person
             #if person_seen is not None :
             #    k9.target = person_seen
@@ -388,13 +391,13 @@ class Following(State):
         k9.speak("Mastah!")
 
     def run(self):
-        #k9.client.loop(0.1)
-        check = k9.scan()
+        # scan for things taller than 60 cm
+        check = k9.scan(top_row = 0, bottom_row = 10)
         if check is not None:
             min_dist = np.amin(check) # was [5:35]
             if min_dist == 4000.0 or min_dist <= SWEET_SPOT:
                 logo.stop
-            result = np.where(check == min_dist)
+            result = np.where((check <= MAX_DIST) | (check >= MIN_DIST))
             print("min dist:", min_dist)
             print("indices:", result)
             direction = np.average(result)
@@ -543,9 +546,32 @@ class K9(object):
                             target = person
                     return target
 
-    def scan(self):
+    def find_closest(self, array, top_row, bottom_row):
+                # Resize the array if necessary by selecting asked
+                # for rows
+                totals = array[top_row:bottom_row,:]
+                # Determine the nearest segment for each of the 40
+                # horizontal segments
+                closest = np.amin(totals, axis = 0 )
+                # Round the to the nearest 10cm
+                closest = np.around(closest)
+                # Change nan values into 4 m distance
+                closest = np.nan_to_num(closest, nan=4000.0)
+                # Convert distance to m
+                closest = closest/1000.0
+                # Turn into a 1D array
+                closest = closest.flatten()
+                return closest
+
+    def scan(self, top_row = 8, bottom_row = 16):
         '''
-        Retrieve a 40 element array derived from the 3D camera
+        Retrieve a 40 element 'horizontal' array derived from a point cloud 
+        based on the 3D depth scan of the camera.
+
+        Closest items to the camera in each vertical segment are in cms.
+
+        The horizontal range of the scan is described by the top and bottom row,
+        which defaults to the bottom 80cm of the scan (the height of the robot)
         '''
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for packet in data_packets:
@@ -569,33 +595,24 @@ class K9(object):
                 # Stack the x, y and z co-ordinates into a single 2D array
                 cloud = np.column_stack((x2,y2,z2))
                 # Filter the array by x and y co-ordinates
-                in_scope = (cloud[:,1]<800) & (cloud[:,1] > 0) & (cloud[:,0]<2000) & (cloud[:,0] > -2000)
+                in_scope = (cloud[:,1]<1600) & (cloud[:,1] > 0) & (cloud[:,0]<2000) & (cloud[:,0] > -2000)
                 in_scope = np.repeat(in_scope, 3)
                 in_scope = in_scope.reshape(-1, 3)
                 scope = np.where(in_scope, cloud, np.nan)
                 # Remove invalid rows from array
                 scope = scope[~np.isnan(scope).any(axis=1)]
-                # Index each point into 10cm x and y bins (40 x 8)
+                # Index each point into 10cm x and y bins (40 x 16)
                 x_index = pd.cut(scope[:,0], x_bins)
                 y_index = pd.cut(scope[:,1], y_bins)
                 # Place the depth values into the corresponding bin
                 binned_depths = pd.Series(scope[:,2])
                 # Average the depth measures in each bin
                 totals = binned_depths.groupby([y_index, x_index]).mean()
-                # Reshape the bins into a 8 x 40 matrix
-                totals = totals.values.reshape(8,40)
-                # Determine the nearest segment for each of the 40
-                # horizontal segments
-                closest = np.amin(totals, axis = 0 )
-                # Round the to the nearest 10cm
-                closest = np.around(closest)
-                # Change nan values into 4 m distance
-                closest = np.nan_to_num(closest, nan=4000.0)
-                # Convert distance to m
-                closest = closest/1000.0
-                # Turn into a 1D array
-                closest = closest.flatten()
+                # Reshape the bins into a 16 x 40 matrix
+                totals = totals.values.reshape(16,40)
+                closest = self.find_closest(totals, top_row = top_row, bottom_row = bottom_row)
                 return closest
+
 
     def mqtt_callback(self, client, userdata, message):
         """
