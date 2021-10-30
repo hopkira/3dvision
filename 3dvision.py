@@ -388,8 +388,8 @@ class Following(State):
             min_dist = np.amin(check) # was [5:35]
             if min_dist == MAX_RANGE or min_dist <= MIN_DIST:
                 logo.stop
-            # result = np.where((check <= MAX_DIST) & (check >= MIN_DIST))
-            result = np.where(check == min_dist)
+            result = np.where((check <= MAX_DIST) & (check >= MIN_DIST))
+            # result = np.where(check == min_dist)
             print("min dist:", min_dist)
             print("indices:", result)
             if len(result[0]) > 0 :
@@ -539,71 +539,104 @@ class K9(object):
                             target = person
                     return target
 
-    def find_closest(self, array, top_row, bottom_row):
-                # Resize the array if necessary by selecting asked
-                # for rows
-                totals = array[top_row:bottom_row,:]
-                # Determine the nearest segment for each of the 40
-                # vertical segments
-                # Change nan values into 4 m distance
-                closest = np.nan_to_num(totals, nan = MAX_RANGE)
-                closest = np.amin(closest, axis = 0 )
-                # Convert distance to m
-                closest = closest/1000.0
-                # Turn into a 1D array
-                closest = closest.flatten()
-                return closest
-
-    def scan(self, top_row = 8, bottom_row = 16):
+    def scan(self, min_range = 500.0, max_range = 12000.0, decimate_level = 20, mean = True):
         '''
-        Retrieve a 40 element 'horizontal' array derived from a point cloud 
-        based on the 3D depth scan of the camera.
-
-        Closest items to the camera in each vertical segment are in cms.
-
-        The horizontal range of the scan is described by the top and bottom row,
-        which defaults to the bottom 80cm of the scan (the height of the robot)
+        Generate an image of the depth image stream from the camera.  This image
+        can be reduced in size by using the decimate_level parameter.  The mechanism
+        to determine the returned value of each new pixel can be the mean or 
+        minimum values across the area.
+        
+        The image is returned as a 2D numpy array.
         '''
+        func = np.mean if mean else np.min
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for packet in data_packets:
             if packet.stream_name == 'depth':
                 frame = packet.getData()
-                # create a specific frame for display
-                image_frame = np.copy(frame)
-                # Process depth map to communicate to robot
-                frame = skim.block_reduce(frame,(decimate,decimate),np.min)
-                height, width = frame.shape
-                # Convert depth map to point cloud with valid depths
-                column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
-                valid = (frame > 200.0) & (frame < MAX_RANGE)
-                z = np.where(valid, frame, 0.0)
-                x = np.where(valid, (z * (column - cx) /cx / fx) + 120.0 , MAX_RANGE)
-                y = np.where(valid, 325.0 - (z * (row - cy) / cy / fy) , MAX_RANGE)
-                # Flatten point cloud axes
-                z2 = z.flatten()
-                x2 = x.flatten()
-                y2 = y.flatten()
-                # Stack the x, y and z co-ordinates into a single 2D array
-                cloud = np.column_stack((x2,y2,z2))
-                # Filter the array by x and y co-ordinates
-                in_scope = (cloud[:,1] < 1600) & (cloud[:,1] > 0) & (cloud[:,0] < 2000) & (cloud[:,0] > -2000)
-                in_scope = np.repeat(in_scope, 3)
-                in_scope = in_scope.reshape(-1, 3)
-                scope = np.where(in_scope, cloud, np.nan)
-                # Remove invalid rows from array
-                scope = scope[~np.isnan(scope).any(axis=1)]
-                # Index each point into 10cm x and y bins (40 x 16)
-                x_index = pd.cut(scope[:,0], x_bins)
-                y_index = pd.cut(scope[:,1], y_bins)
-                # Place the depth values into the corresponding bin
-                binned_depths = pd.Series(scope[:,2])
-                # Average the depth measures in each bin
-                totals = binned_depths.groupby([y_index, x_index]).mean()
-                # Reshape the bins into a 16 x 40 matrix
-                totals = totals.values.reshape(16,40)
-                closest = self.find_closest(totals, top_row = top_row, bottom_row = bottom_row)
-                return closest
+                valid_frame = (frame >= min_range) & (frame <= max_range)
+                valid_image = np.where(valid_frame, frame, max_range)
+                decimated_valid_image = skim.block_reduce(valid_image,(decimate_level,decimate_level),func)
+                return decimated_valid_image
 
+    def point_cloud(self, frame, min_range = 200.0, max_range = 4000.0):
+        '''
+        Generates a point cloud based on the provided numpy 2D depth array.
+        
+        Returns a 16 x 40 numpy matrix describing the forward distance to
+        the points within the field of view of the camera.
+        
+        Initial measures closer than the min_range are discarded.  Those outside of the
+        max_range are set to the max_range.
+        '''
+        height, width = frame.shape
+        # Convert depth map to point cloud with valid depths
+        column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
+        valid = (frame >= min_range) & (frame <= max_range)
+        global test_image
+        test_image = np.where(valid, frame, max_range)
+        z = np.where(valid, frame, 0.0)
+        x = np.where(valid, (z * (column - cx) /cx / fx) + 120.0 , max_range)
+        y = np.where(valid, 325.0 - (z * (row - cy) / cy / fy) , max_range)
+        # Flatten point cloud axes
+        z2 = z.flatten()
+        x2 = x.flatten()
+        y2 = y.flatten()
+        # Stack the x, y and z co-ordinates into a single 2D array
+        cloud = np.column_stack((x2,y2,z2))
+        # Filter the array by x and y co-ordinates
+        in_scope = (cloud[:,1] < 1600) & (cloud[:,1] > 0) & (cloud[:,0] < 2000) & (cloud[:,0] > -2000)
+        in_scope = np.repeat(in_scope, 3)
+        in_scope = in_scope.reshape(-1, 3)
+        scope = np.where(in_scope, cloud, np.nan)
+        # Remove invalid rows from array
+        scope = scope[~np.isnan(scope).any(axis=1)]
+        # Index each point into 10cm x and y bins (40 x 16)
+        x_index = pd.cut(scope[:,0], x_bins)
+        y_index = pd.cut(scope[:,1], y_bins)
+        # Place the depth values into the corresponding bin
+        binned_depths = pd.Series(scope[:,2])
+        # Average the depth measures in each bin
+        totals = binned_depths.groupby([y_index, x_index]).mean()
+        # Reshape the bins into a 16 x 40 matrix
+        totals = totals.values.reshape(16,40)
+        return totals
+
+    def find_person(self, image, max_range = 1200.0, certainty = 0.75):
+        # determine size of supplied image
+        height, width = image.shape
+        # just use the top half for analysis
+        # as this will ignore low obstacles
+        half_height = int(height/2)
+        image = image[0:half_height,:]
+        # find all the columns within the image where there are a
+        # consistently significant number of valid depth measurements
+        # this suggests a target in range that is reasonably tall
+        # and vertical (hopefully a person's legs
+        columns = np.sum(image < max_range, axis = 0) >= (certainty*half_height)
+        # average the depth values of each column
+        distance = np.average(image, axis = 0)
+        # create an array with just the useful distances (by zeroing
+        # out any columns with inconsistent data)
+        useful_distances = distance * columns
+        # average out all the useful distances
+        # ignoring the zeros and the max_ranges
+        subset = useful_distances[np.where((useful_distances < max_range) & (useful_distances > 0.0))]
+        if len(subset) > 0:
+            distance = np.average(subset)
+        else:
+            distance = 0.0
+        # determine the indices of the valid columns and average them
+        # us the size of the image to determine a relative strength of
+        # direction that can be converted into an angle once fov of
+        # camera is known (range is theoretically -1 to +1 that
+        # corresponds to the h_fov of the camera)
+        mid_point = (width - 1.0) / 2.0
+        indices = columns.nonzero()
+        if len(indices[0]) > 0 :
+            direction = (np.average(indices) - mid_point) / width * 2
+        else:
+            direction = 0.0
+        return (direction, distance)
 
     def mqtt_callback(self, client, userdata, message):
         """
