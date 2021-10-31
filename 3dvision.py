@@ -389,17 +389,18 @@ class Following(State):
     def run(self):
         # scan for things taller than 60 cm
         depth_image = k9.scan()
-        direction, distance = k9.follow_vector(depth_image)
-        if distance >= MAX_DIST or distance <= MIN_DIST:
-            logo.stop()
-        angle = direction * math.radians(77.0)
-        if abs(angle) >= 0.1 :
-            if distance <= MAX_DIST:
-                logo.rt(angle, fast = True)
-        else:
-            move = distance - SWEET_SPOT
-            if  distance <= MAX_DIST and abs(move > 0.05) :
-                logo.fd(move)
+        if depth_image is not None:
+            direction, distance = k9.follow_vector(depth_image)
+            if distance >= MAX_DIST or distance <= MIN_DIST:
+                logo.stop()
+            angle = direction * math.radians(77.0)
+            if abs(angle) >= 0.1 :
+                if distance <= MAX_DIST:
+                    logo.rt(angle, fast = True)
+            else:
+                move = distance - SWEET_SPOT
+                if  distance <= MAX_DIST and abs(move > 0.05) :
+                    logo.fd(move)
 
     def on_event(self, event):
         if event == 'chefoloff':
