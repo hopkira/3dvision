@@ -388,7 +388,8 @@ class Following(State):
 
     def run(self):
         # scan for things taller than 60 cm
-        direction, distance = k9.follow_vector()
+        depth_image = k9.scan()
+        direction, distance = k9.follow_vector(depth_image)
         if distance >= MAX_DIST or distance <= MIN_DIST:
             logo.stop()
         angle = direction * math.radians(77.0)
