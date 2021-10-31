@@ -638,7 +638,7 @@ class K9(object):
         mid_point = (width - 1.0) / 2.0
         indices = columns.nonzero()
         if len(indices[0]) > 0 :
-            direction = (np.average(indices) - mid_point) / width * 2
+            direction = (np.average(indices) - mid_point) / width
         else:
             direction = 0.0
         return (direction, distance)
