@@ -50,15 +50,17 @@ ap.set_defaults(active = False)
 ap.set_defaults(follow = False)     
 args = vars(ap.parse_args())
 
-# Populate following distances from command line
+# Populate following distances from command line in m
 MAX_DIST = args['max']
 MIN_DIST = args['min']
 CONF = args['conf']
 SWEET_SPOT = MIN_DIST + (MAX_DIST - MIN_DIST) / 2.0
 
-# 2D camerac capability
+# 2D camerac capability in mm
 MAX_RANGE = 4000.0
 MIN_RANGE = 200.0
+
+M2MM = 1000.0
 
 print("Sweet spot is",SWEET_SPOT,"meters from robot")
 
@@ -382,11 +384,11 @@ class Following(State):
 
     def run(self):
         # scan for things taller than 60 cm
-        depth_image = k9.scan(min_range = MIN_DIST, max_range = MAX_DIST)
+        depth_image = k9.scan(min_range = MIN_DIST * M2MM, max_range = MAX_DIST * M2MM)
         if depth_image is not None:
             direction, distance = k9.follow_vector(depth_image, certainty=CONF)
             if distance is not None and direction is not None:
-                distance = distance / 1000.0
+                distance = distance / M2MM
                 print("Following: direction:", direction, "distance:", distance)
                 angle = direction * math.radians(77.0)
                 move = (distance - SWEET_SPOT)
@@ -534,7 +536,7 @@ class K9(object):
                             target = person
                     return target
 
-    def scan(self, min_range = MIN_DIST, max_range = MAX_DIST, decimate_level = 20, mean = True):
+    def scan(self, min_range = MIN_DIST * M2MM, max_range = MAX_DIST * M2MM, decimate_level = 20, mean = True):
         '''
         Generate a simplified image of the depth image stream from the camera.  This image
         can be reduced in size by using the decimate_level parameter.  
@@ -602,7 +604,7 @@ class K9(object):
         totals = totals.values.reshape(16,40)
         return totals
 
-    def follow_vector(self, image, max_range = MAX_DIST, min_range = MIN_DIST, certainty = CONF):
+    def follow_vector(self, image, max_range = MAX_DIST * M2MM, min_range = MIN_DIST * M2MM, certainty = CONF):
         final_distance = None
         direction = None
         # determine size of supplied image
