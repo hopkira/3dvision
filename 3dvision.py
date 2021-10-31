@@ -36,7 +36,7 @@ from subprocess import Popen
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-a", "--max", type=float, default = 1.0,
+ap.add_argument("-a", "--max", type=float, default = 1.5,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default = 0.50,
 	help="Minimium distance")
@@ -399,9 +399,6 @@ class Following(State):
             direction, distance = k9.follow_vector(depth_image)
             distance = distance / 1000.0
             print("Following: direction:", direction, "distance:", distance)
-            if distance >= MAX_DIST or distance <= MIN_DIST:
-                print("Following: emergency stop")
-                logo.stop()
             angle = direction * math.radians(77.0)
             print("Following: angle to move:", angle)
             if abs(angle) >= 0.1 :
