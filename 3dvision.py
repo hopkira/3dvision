@@ -400,14 +400,16 @@ class Following(State):
             if distance is not None and direction is not None:
                 distance = distance / 1000.0
                 print("Following: direction:", direction, "distance:", distance)
-                angle = direction * math.radians(77.0) / 4.0
-                move = (distance - SWEET_SPOT) / 2.0
+                angle = direction * math.radians(77.0)
+                move = (distance - SWEET_SPOT)
                 print("Following: angle:", angle, "move:", move)
-                if abs(angle) >= 0.1 :
-                    logo.rt(angle, fast = True)
+                damp_angle = 4.0
+                damp_distance = 4.0
+                if abs(angle) >= (0.1 * damp_angle) :
+                    logo.rt(angle / damp_angle, fast = True)
                 else:
-                    if abs(move) >= 0.05 :
-                        logo.fd(move)
+                    if abs(move) >= (0.05 * damp_distance) :
+                        logo.fd(move / damp_distance)
                         return
 
     def on_event(self, event):
