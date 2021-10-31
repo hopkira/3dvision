@@ -40,7 +40,7 @@ ap.add_argument("-a", "--max", type=float, default = 1.5,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default = 0.50,
 	help="Minimium distance")
-ap.add_argument("-c", "--conf", type=float, default = 0.70,
+ap.add_argument("-c", "--conf", type=float, default = 0.75,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
@@ -384,7 +384,7 @@ class Following(State):
 
     def run(self):
         # scan for things taller than 60 cm
-        depth_image = k9.scan(min_range = MIN_DIST * M2MM, max_range = MAX_DIST * M2MM)
+        depth_image = k9.scan(min_range = MIN_RANGE, max_range = MAX_DIST * M2MM)
         if depth_image is not None:
             direction, distance = k9.follow_vector(depth_image, certainty=CONF)
             if distance is not None and direction is not None:
@@ -604,7 +604,7 @@ class K9(object):
         totals = totals.values.reshape(16,40)
         return totals
 
-    def follow_vector(self, image, max_range = MAX_DIST * M2MM, min_range = MIN_DIST * M2MM, certainty = CONF):
+    def follow_vector(self, image, max_range = MAX_DIST * M2MM, certainty = CONF):
         final_distance = None
         direction = None
         # determine size of supplied image
