@@ -402,11 +402,11 @@ class Following(State):
                 print("Following: direction:", direction, "distance:", distance)
                 angle = direction * math.radians(77.0) / 2.0
                 move = distance - SWEET_SPOT
-                if logo.finished_move():
-                    if abs(angle) >= 0.1 :
-                        logo.rt(angle, fast = True)
-                        return
-                    if abs(move > 0.05) :
+                print("Following: angle:", angle, "distance:", move)
+                if abs(angle) >= 0.1 :
+                    logo.rt(angle, fast = True)
+                else:
+                    if abs(move >= 0.05) :
                         logo.fd(move)
                         return
 
