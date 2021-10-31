@@ -397,18 +397,18 @@ class Following(State):
         depth_image = k9.scan(min_range = 200.0, max_range = 1500.0,)
         if depth_image is not None:
             direction, distance = k9.follow_vector(depth_image)
-        if distance is not None and direction is not None:
-            distance = distance / 1000.0
-            print("Following: direction:", direction, "distance:", distance)
-            angle = direction * math.radians(77.0) / 2.0
-            print("Following: angle to move:", angle)
-            if abs(angle) >= 0.1 :
-                if distance <= MAX_DIST:
-                    logo.rt(angle, fast = True)
-            else:
-                move = distance - SWEET_SPOT
-                if  distance <= MAX_DIST and abs(move > 0.05) :
-                    logo.fd(move)
+            if distance is not None and direction is not None:
+                distance = distance / 1000.0
+                print("Following: direction:", direction, "distance:", distance)
+                angle = direction * math.radians(77.0) / 2.0
+                print("Following: angle to move:", angle)
+                if abs(angle) >= 0.1 :
+                    if distance <= MAX_DIST:
+                        logo.rt(angle, fast = True)
+                else:
+                    move = distance - SWEET_SPOT
+                    if  distance <= MAX_DIST and abs(move > 0.05) :
+                        logo.fd(move)
 
     def on_event(self, event):
         if event == 'chefoloff':
