@@ -610,7 +610,7 @@ class K9(object):
         return totals
 
     def follow_vector(self, image, max_range = 1200.0, certainty = 0.75):
-        distance = None
+        final_distance = None
         direction = None
         # determine size of supplied image
         height, width = image.shape
@@ -632,7 +632,7 @@ class K9(object):
         # ignoring the zeros and the max_ranges
         subset = useful_distances[np.where((useful_distances < max_range) & (useful_distances > 0.0))]
         if len(subset) > 0:
-            distance = np.average(subset)
+            final_distance = np.average(subset)
         # determine the indices of the valid columns and average them
         # us the size of the image to determine a relative strength of
         # direction that can be converted into an angle once fov of
@@ -642,7 +642,7 @@ class K9(object):
         indices = columns.nonzero()
         if len(indices[0]) > 0 :
             direction = (np.average(indices) - mid_point) / width
-        return (direction, distance)
+        return (direction, final_distance)
 
     def mqtt_callback(self, client, userdata, message):
         """
