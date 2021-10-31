@@ -397,7 +397,7 @@ class Following(State):
         depth_image = k9.scan(min_range = 200.0, max_range = 1500.0,)
         if depth_image is not None:
             direction, distance = k9.follow_vector(depth_image)
-            distance = distance / 100.0
+            distance = distance / 1000.0
             print("Following: direction:", direction, "distance:", distance)
             if distance >= MAX_DIST or distance <= MIN_DIST:
                 print("Following: emergency stop")
