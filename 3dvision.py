@@ -400,7 +400,7 @@ class Following(State):
             if distance is not None and direction is not None:
                 distance = distance / 1000.0
                 print("Following: direction:", direction, "distance:", distance)
-                angle = direction * math.radians(77.0) / 2.0
+                angle = direction * math.radians(77.0)
                 move = distance - SWEET_SPOT
                 print("Following: angle:", angle, "distance:", move)
                 if abs(angle) >= 0.1 :
