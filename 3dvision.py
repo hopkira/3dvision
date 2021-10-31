@@ -391,9 +391,11 @@ class Following(State):
         depth_image = k9.scan()
         if depth_image is not None:
             direction, distance = k9.follow_vector(depth_image)
+            print("Following: direction:", direction, "distance:", distance)
             if distance >= MAX_DIST or distance <= MIN_DIST:
                 logo.stop()
             angle = direction * math.radians(77.0)
+            print("Following: angle to move:", angle)
             if abs(angle) >= 0.1 :
                 if distance <= MAX_DIST:
                     logo.rt(angle, fast = True)
