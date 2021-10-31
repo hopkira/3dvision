@@ -36,7 +36,7 @@ from subprocess import Popen
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
-ap.add_argument("-a", "--max", type=float, default = 1.5,
+ap.add_argument("-a", "--max", type=float, default = 1.2,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default = 0.50,
 	help="Minimium distance")
