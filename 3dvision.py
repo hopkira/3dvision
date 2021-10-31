@@ -330,19 +330,22 @@ class Moving_Forward(State):
         # the field of view and adjust
         # if necessary
         if not logo.finished_move():
+            pass
             # check for obstacles
-            depth_image = k9.scan()
-            print("Moving Forward: depth image:", depth_image[0].shape(), type(depth_image)) 
-            check = k9.point_cloud(depth_image[0])
-            print("Moving Forward: check:", check.shape()), type(check) 
-            if check is not None:
-                min_dist = np.amin(check[17:25]) # narrow to robot width
-                print("Min dist:", min_dist)
-                # determine rolling average of distance to target
-                self.avg_dist = (self.avg_dist + min_dist) / 2.0
-                if self.avg_dist <= SWEET_SPOT:
-                    logo.stop()
-                    k9.on_event('target_reached')
+            # DEBUG BELOW
+            #depth_image = k9.scan()
+            #print("Moving Forward: depth image:", depth_image[0].shape(), type(depth_image)) 
+            #check = k9.point_cloud(depth_image[0])
+            #print("Moving Forward: check:", check.shape()), type(check) 
+            #if check is not None:
+            #    min_dist = np.amin(check[17:25]) # narrow to robot width
+            #    print("Min dist:", min_dist)
+            #    # determine rolling average of distance to target
+            #    self.avg_dist = (self.avg_dist + min_dist) / 2.0
+            #    if self.avg_dist <= SWEET_SPOT:
+            #        logo.stop()
+            #        k9.on_event('target_reached')
+            # DEBUG ABOVE
             #person_seen = k9.person_scan() # check for person
             #if person_seen is not None :
             #    k9.target = person_seen
