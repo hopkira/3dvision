@@ -40,7 +40,7 @@ ap.add_argument("-a", "--max", type=float, default = 1.5,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default = 0.20,
 	help="Minimium distance")
-ap.add_argument("-c", "--conf", type=float, default = 0.80,
+ap.add_argument("-c", "--conf", type=float, default = 0.70,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
@@ -403,7 +403,7 @@ class Following(State):
                 angle = direction * math.radians(77.0)
                 move = (distance - SWEET_SPOT)
                 print("Following: angle:", angle, "move:", move)
-                damp_angle = 2.0
+                damp_angle = 3.0
                 damp_distance = 2.0
                 if abs(angle) >= (0.1 * damp_angle) :
                     logo.rt(angle / damp_angle, fast = True)
