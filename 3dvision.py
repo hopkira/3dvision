@@ -397,9 +397,10 @@ class Following(State):
         depth_image = k9.scan(min_range = 200.0, max_range = 1500.0,)
         if depth_image is not None:
             direction, distance = k9.follow_vector(depth_image)
+        if distance is not None and direction is not None:
             distance = distance / 1000.0
             print("Following: direction:", direction, "distance:", distance)
-            angle = direction * math.radians(77.0)
+            angle = direction * math.radians(77.0) / 2.0
             print("Following: angle to move:", angle)
             if abs(angle) >= 0.1 :
                 if distance <= MAX_DIST:
@@ -528,7 +529,7 @@ class K9(object):
         nnet_packets, data_packets = body_cam.get_available_nnet_and_data_packets()
         for nnet_packet in nnet_packets:
             detections = list(nnet_packet.getDetectedObjects())
-            if detections is not None:
+            if detections is not None :
                 people = [detection for detection in detections
                             if detection.label == 15
                             if detection.confidence > CONF]
@@ -607,6 +608,8 @@ class K9(object):
         return totals
 
     def follow_vector(self, image, max_range = 1200.0, certainty = 0.75):
+        distance = None
+        direction = None
         # determine size of supplied image
         height, width = image.shape
         # just use the top half for analysis
@@ -628,8 +631,6 @@ class K9(object):
         subset = useful_distances[np.where((useful_distances < max_range) & (useful_distances > 0.0))]
         if len(subset) > 0:
             distance = np.average(subset)
-        else:
-            distance = 0.0
         # determine the indices of the valid columns and average them
         # us the size of the image to determine a relative strength of
         # direction that can be converted into an angle once fov of
@@ -639,8 +640,6 @@ class K9(object):
         indices = columns.nonzero()
         if len(indices[0]) > 0 :
             direction = (np.average(indices) - mid_point) / width
-        else:
-            direction = 0.0
         return (direction, distance)
 
     def mqtt_callback(self, client, userdata, message):
