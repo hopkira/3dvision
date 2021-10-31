@@ -394,7 +394,7 @@ class Following(State):
 
     def run(self):
         # scan for things taller than 60 cm
-        depth_image = k9.scan()
+        depth_image = k9.scan(min_range = 200.0, max_range = 1500.0,)
         if depth_image is not None:
             direction, distance = k9.follow_vector(depth_image)
             print("Following: direction:", direction, "distance:", distance)
@@ -544,7 +544,7 @@ class K9(object):
                             target = person
                     return target
 
-    def scan(self, min_range = 500.0, max_range = 12000.0, decimate_level = 20, mean = True):
+    def scan(self, min_range = 500.0, max_range = 1200.0, decimate_level = 20, mean = True):
         '''
         Generate a simplified image of the depth image stream from the camera.  This image
         can be reduced in size by using the decimate_level parameter.  
