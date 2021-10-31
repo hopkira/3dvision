@@ -38,7 +38,7 @@ from subprocess import Popen
 ap = argparse.ArgumentParser()
 ap.add_argument("-a", "--max", type=float, default = 1.5,
 	help="Maximum distance")
-ap.add_argument("-i", "--min", type=float, default = 0.20,
+ap.add_argument("-i", "--min", type=float, default = 0.50,
 	help="Minimium distance")
 ap.add_argument("-c", "--conf", type=float, default = 0.70,
 	help="Confidence")
@@ -50,10 +50,15 @@ ap.set_defaults(active = False)
 ap.set_defaults(follow = False)     
 args = vars(ap.parse_args())
 
+# Populate following distances from command line
 MAX_DIST = args['max']
 MIN_DIST = args['min']
 CONF = args['conf']
 SWEET_SPOT = MIN_DIST + (MAX_DIST - MIN_DIST) / 2.0
+
+# 2D camerac capability
+MAX_RANGE = 4000.0
+MIN_RANGE = 200.0
 
 print("Sweet spot is",SWEET_SPOT,"meters from robot")
 
@@ -119,15 +124,6 @@ def nn_to_depth_coord(x, y, nn2depth):
     x_depth = int(nn2depth['off_x'] + x * nn2depth['max_w'])
     y_depth = int(nn2depth['off_y'] + y * nn2depth['max_h'])
     return x_depth, y_depth
-
-decimate = 20
-MAX_RANGE = 4000.0
-height = 400.0
-width = 640.0
-cx = width/decimate/2
-cy = height/decimate/2
-fx = 1.4 # values found by measuring known sized objects at known distances
-fy = 2.05
 
 prev_frame = 0
 now_frame = 0
@@ -319,7 +315,7 @@ class Moving_Forward(State):
     The child state where K9 is moving forwards to the target
     '''
     def __init__(self):
-        self.avg_dist = 4.0
+        self.avg_dist = MAX_RANGE
         super(Moving_Forward, self).__init__()
         z = float(k9.target.depth_z)
         distance = float(z - SWEET_SPOT)
@@ -330,27 +326,19 @@ class Moving_Forward(State):
     def run(self):
         k9.client.loop(0.1)
         # If robot is moving, then check for a 
-        # potential collision (or a complete lack of
-        # targets.  If nothiing to worry about then
-        # check for a person in 
-        # the field of view and adjust
-        # if necessary
+        # potential collision
         if not logo.finished_move():
-            pass
-            # check for obstacles
-            # DEBUG BELOW
-            #depth_image = k9.scan()
-            #print("Moving Forward: depth image:", depth_image[0].shape(), type(depth_image)) 
-            #check = k9.point_cloud(depth_image[0])
-            #print("Moving Forward: check:", check.shape()), type(check) 
-            #if check is not None:
-            #    min_dist = np.amin(check[17:25]) # narrow to robot width
-            #    print("Min dist:", min_dist)
-            #    # determine rolling average of distance to target
-            #    self.avg_dist = (self.avg_dist + min_dist) / 2.0
-            #    if self.avg_dist <= SWEET_SPOT:
-            #        logo.stop()
-            #        k9.on_event('target_reached')
+            depth_image = k9.scan(min_range = MIN_RANGE, max_range = MAX_RANGE, decimate_level = 20, mean = True)
+            if depth_image is not None:
+                check = k9.point_cloud(depth_image[0])
+                if check is not None:
+                    min_dist = np.amin(check[17:25]) # narrow to robot width
+                    print("Min dist:", min_dist)
+                    # determine rolling average of distance to target
+                    self.avg_dist = (self.avg_dist + min_dist) / 2.0
+                    if self.avg_dist <= SWEET_SPOT:
+                        logo.stop()
+                        k9.on_event('target_reached')
             # DEBUG ABOVE
             #person_seen = k9.person_scan() # check for person
             #if person_seen is not None :
@@ -394,7 +382,7 @@ class Following(State):
 
     def run(self):
         # scan for things taller than 60 cm
-        depth_image = k9.scan(min_range = 200.0, max_range = 1500.0,)
+        depth_image = k9.scan(min_range = MIN_DIST, max_range = MAX_DIST)
         if depth_image is not None:
             direction, distance = k9.follow_vector(depth_image, certainty=CONF)
             if distance is not None and direction is not None:
@@ -546,7 +534,7 @@ class K9(object):
                             target = person
                     return target
 
-    def scan(self, min_range = 500.0, max_range = 1200.0, decimate_level = 20, mean = True):
+    def scan(self, min_range = MIN_DIST, max_range = MAX_DIST, decimate_level = 20, mean = True):
         '''
         Generate a simplified image of the depth image stream from the camera.  This image
         can be reduced in size by using the decimate_level parameter.  
@@ -566,7 +554,7 @@ class K9(object):
                 decimated_valid_image = skim.block_reduce(valid_image,(decimate_level,decimate_level),func)
                 return decimated_valid_image
 
-    def point_cloud(self, frame, min_range = 200.0, max_range = 4000.0):
+    def point_cloud(self, frame, min_range = MIN_RANGE, max_range = MAX_RANGE, decimate_level = 20.0):
         '''
         Generates a point cloud based on the provided numpy 2D depth array.
         
@@ -577,6 +565,11 @@ class K9(object):
         max_range are set to the max_range.
         '''
         height, width = frame.shape
+        cx = width/decimate_level/2
+        cy = height/decimate_level/2
+        # fx and fy values found by measuring known sized objects at known distances
+        fx = 1.4 
+        fy = 2.05
         # Convert depth map to point cloud with valid depths
         column, row = np.meshgrid(np.arange(width), np.arange(height), sparse=True)
         valid = (frame >= min_range) & (frame <= max_range)
@@ -609,7 +602,7 @@ class K9(object):
         totals = totals.values.reshape(16,40)
         return totals
 
-    def follow_vector(self, image, max_range = 1200.0, certainty = 0.75):
+    def follow_vector(self, image, max_range = MAX_DIST, min_range = MIN_DIST, certainty = CONF):
         final_distance = None
         direction = None
         # determine size of supplied image
@@ -630,7 +623,7 @@ class K9(object):
         useful_distances = distance * columns
         # average out all the useful distances
         # ignoring the zeros and the max_ranges
-        subset = useful_distances[np.where((useful_distances < max_range) & (useful_distances > 0.0))]
+        subset = useful_distances[np.where((useful_distances < max_range) & (useful_distances > min_range))]
         if len(subset) > 0:
             final_distance = np.average(subset)
         # determine the indices of the valid columns and average them
