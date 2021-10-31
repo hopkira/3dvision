@@ -40,7 +40,7 @@ ap.add_argument("-a", "--max", type=float, default = 1.2,
 	help="Maximum distance")
 ap.add_argument("-i", "--min", type=float, default = 0.50,
 	help="Minimium distance")
-ap.add_argument("-c", "--conf", type=float, default = 0.75,
+ap.add_argument("-c", "--conf", type=float, default = 0.8,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
@@ -386,7 +386,7 @@ class Following(State):
         # scan for things taller than 60 cm
         depth_image = k9.scan(min_range = MIN_RANGE, max_range = MAX_DIST * M2MM)
         if depth_image is not None:
-            direction, distance = k9.follow_vector(depth_image, certainty=CONF)
+            direction, distance = k9.follow_vector(depth_image)
             if distance is not None and direction is not None:
                 distance = distance / M2MM
                 print("Following: direction:", direction, "distance:", distance)
@@ -617,7 +617,7 @@ class K9(object):
         # consistently significant number of valid depth measurements
         # this suggests a target in range that is reasonably tall
         # and vertical (hopefully a person's legs
-        columns = np.sum(image < max_range, axis = 0) >= (certainty*half_height)
+        columns = np.sum(image < max_range, axis = 0) >= (certainty * half_height)
         # average the depth values of each column
         distance = np.average(image, axis = 0)
         # create an array with just the useful distances (by zeroing
