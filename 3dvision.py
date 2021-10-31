@@ -170,7 +170,7 @@ class State(object):
         return self.__class__.__name__
 
 
-# Declare the basic K9 operational states
+# Declare the K9 operational states
 class Initializing(State):
     '''
     The child state where K9 is waiting and appears dormant
@@ -331,7 +331,8 @@ class Moving_Forward(State):
         # if necessary
         if not logo.finished_move():
             # check for obstacles
-            check = k9.scan() 
+            depth_image = k9.scan() 
+            check = k9.point_cloud(depth_image)
             if check is not None:
                 min_dist = np.amin(check[17:25]) # narrow to robot width
                 print("Min dist:", min_dist)
@@ -382,28 +383,17 @@ class Following(State):
 
     def run(self):
         # scan for things taller than 60 cm
-        check = k9.scan(top_row = 0, bottom_row = 16) # full scan
-        if check is not None:
-            print(check)
-            min_dist = np.amin(check) # was [5:35]
-            if min_dist == MAX_RANGE or min_dist <= MIN_DIST:
-                logo.stop
-            result = np.where((check <= MAX_DIST) & (check >= MIN_DIST))
-            # result = np.where(check == min_dist)
-            print("min dist:", min_dist)
-            print("indices:", result)
-            if len(result[0]) > 0 :
-                direction = np.average(result)
-                print("avg_indices:", direction)
-                angle = (direction - 19.5 ) * h_bucket_fov
-                print(angle)
-                if abs(angle) >= 0.1 :
-                    if min_dist <= MAX_DIST:
-                        logo.rt(angle, fast = True)
-                else:
-                    dist = min_dist - SWEET_SPOT
-                    if  min_dist <= MAX_DIST and dist > 0.05 :
-                        logo.fd(dist)
+        direction, distance = k9.follow_vector()
+        if distance >= MAX_DIST or distance <= MIN_DIST:
+            logo.stop()
+        angle = direction * math.radians(77.0)
+        if abs(angle) >= 0.1 :
+            if distance <= MAX_DIST:
+                logo.rt(angle, fast = True)
+        else:
+            move = distance - SWEET_SPOT
+            if  distance <= MAX_DIST and abs(move > 0.05) :
+                logo.fd(move)
 
     def on_event(self, event):
         if event == 'chefoloff':
@@ -541,10 +531,11 @@ class K9(object):
 
     def scan(self, min_range = 500.0, max_range = 12000.0, decimate_level = 20, mean = True):
         '''
-        Generate an image of the depth image stream from the camera.  This image
-        can be reduced in size by using the decimate_level parameter.  The mechanism
-        to determine the returned value of each new pixel can be the mean or 
-        minimum values across the area.
+        Generate a simplified image of the depth image stream from the camera.  This image
+        can be reduced in size by using the decimate_level parameter.  
+        It also will remove invalid data from the image (too close or too near pixels)
+        The mechanism to determine the returned value of each new pixel can be the mean or 
+        minimum values across the area can also be specified.
         
         The image is returned as a 2D numpy array.
         '''
@@ -601,7 +592,7 @@ class K9(object):
         totals = totals.values.reshape(16,40)
         return totals
 
-    def find_person(self, image, max_range = 1200.0, certainty = 0.75):
+    def follow_vector(self, image, max_range = 1200.0, certainty = 0.75):
         # determine size of supplied image
         height, width = image.shape
         # just use the top half for analysis
