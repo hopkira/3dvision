@@ -625,7 +625,7 @@ class K9(object):
         useful_distances = distance * columns
         # average out all the useful distances
         # ignoring the zeros and the max_ranges
-        subset = useful_distances[np.where((useful_distances < max_range) & (useful_distances > min_range))]
+        subset = useful_distances[np.where((useful_distances < max_range) & (useful_distances > 0.0))]
         if len(subset) > 0:
             final_distance = np.average(subset)
         # determine the indices of the valid columns and average them
