@@ -331,8 +331,10 @@ class Moving_Forward(State):
         # if necessary
         if not logo.finished_move():
             # check for obstacles
-            depth_image = k9.scan() 
+            depth_image = k9.scan()
+            print("Moving Forward: depth image:", depth_image.shape(), type(depth_image)) 
             check = k9.point_cloud(depth_image)
+            print("Moving Forward: check:", check.shape()), type(check) 
             if check is not None:
                 min_dist = np.amin(check[17:25]) # narrow to robot width
                 print("Min dist:", min_dist)
