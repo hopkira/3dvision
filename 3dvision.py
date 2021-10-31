@@ -401,14 +401,14 @@ class Following(State):
                 distance = distance / 1000.0
                 print("Following: direction:", direction, "distance:", distance)
                 angle = direction * math.radians(77.0) / 2.0
-                print("Following: angle to move:", angle)
-                if abs(angle) >= 0.1 :
-                    if distance <= MAX_DIST:
+                move = distance - SWEET_SPOT
+                if logo.finished_move():
+                    if abs(angle) >= 0.1 :
                         logo.rt(angle, fast = True)
-                else:
-                    move = distance - SWEET_SPOT
-                    if  distance <= MAX_DIST and abs(move > 0.05) :
+                        return
+                    if abs(move > 0.05) :
                         logo.fd(move)
+                        return
 
     def on_event(self, event):
         if event == 'chefoloff':
