@@ -403,8 +403,8 @@ class Following(State):
                 angle = direction * math.radians(77.0)
                 move = (distance - SWEET_SPOT)
                 print("Following: angle:", angle, "move:", move)
-                damp_angle = 4.0
-                damp_distance = 4.0
+                damp_angle = 1.25
+                damp_distance = 1.5
                 if abs(angle) >= (0.1 * damp_angle) :
                     logo.rt(angle / damp_angle, fast = True)
                 else:
