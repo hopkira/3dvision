@@ -9,6 +9,7 @@ Args:
     -i, --min (float): Minimum distance to follow
     -c, --conf (float): Confidence level
     --active :  Start in active mode
+    --follow : Start in follow mode
 
 Example:
     $ python3 3dvision.py -a 2.0 -i 0.2 -c 0.75 --active
@@ -43,9 +44,10 @@ ap.add_argument("-c", "--conf", type=float, default = 0.90,
 	help="Confidence")
 ap.add_argument('--active', dest='active', action='store_true',
     help="Active mode")
-ap.add_argument('--inactive', dest='active', action='store_false',
-    help="Inactive mode")
-ap.set_defaults(active = False)    
+ap.add_argument('--follow', dest='follow', action='store_true',
+    help="Follow mode")
+ap.set_defaults(active = False) 
+ap.set_defaults(follow = False)     
 args = vars(ap.parse_args())
 
 MAX_DIST = args['max']
@@ -184,6 +186,8 @@ class Initializing(State):
         k9.client.loop(0.1)
         if args['active'] == True:
             k9.on_event('start_scan')
+        if args['follow'] == True:
+            k9.on_event('follow')
 
     def on_event(self, event):
         # Various events that can come from the watch...
@@ -191,6 +195,8 @@ class Initializing(State):
             return Awake()
         if event == "start_scan":
             return Scanning()
+        if event == 'follow':
+            return Following()
         return self
 
 
